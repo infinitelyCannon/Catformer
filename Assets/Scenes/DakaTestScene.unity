@@ -399,6 +399,13 @@ MonoBehaviour:
   spawnPoints:
   - {fileID: 55013829}
   - {fileID: 1453035285}
+  animCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  height: 0
 --- !u!4 &861782404
 Transform:
   m_ObjectHideFlags: 0

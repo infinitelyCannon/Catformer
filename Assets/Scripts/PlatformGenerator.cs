@@ -8,8 +8,9 @@ public class PlatformGenerator : MonoBehaviour
     public GameObject[] templates;
     public int spawnRate;
     public Transform[] spawnPoints;
+    public AnimationCurve animCurve;
 
-    private float height;
+    public float height;
     private float timer = 0f;
 
     // Start is called before the first frame update
