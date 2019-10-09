@@ -35,4 +35,9 @@ public class PlatformGenerator : MonoBehaviour
     {
         
     }
+
+    bool shouldSpawnWhite()
+    {
+        return false;
+    }
 }
