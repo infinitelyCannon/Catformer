@@ -12,6 +12,7 @@ public class PlatformGenerator : MonoBehaviour
 
     public float height;
     private float timer = 0f;
+    private int[] weights = { 3, 3, 3 };
 
     // Start is called before the first frame update
     void Start()
@@ -27,17 +28,46 @@ public class PlatformGenerator : MonoBehaviour
         if(timer >= delay)
         {
             timer -= timer;
-            Instantiate(templates[Random.Range(0, templates.Length)], spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
+            int rand = Random.Range(1, Sum(weights) + 1);
+            int index;
+            for(index = 0; index < templates.Length; index++)
+            {
+                rand -= weights[index];
+                if (rand <= 0)
+                    break;
+            }
+            Instantiate(templates[index], spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
+            ShiftWeights(index);
         }
     }
 
-    void Spawn()
+    int Sum(int[] arr)
     {
-        
+        int result = 0;
+
+        for (int i = 0; i < arr.Length; i++)
+            result += arr[i];
+
+        return result;
     }
 
-    bool shouldSpawnWhite()
+    void ShiftWeights(int index)
     {
-        return false;
+        switch (index)
+        {
+            case 1:
+            case 2:
+                weights[1] -= 1;
+                weights[2] -= 1;
+                weights[0] += 2;
+                break;
+            case 0:
+                weights[1] += 1;
+                weights[2] += 1;
+                weights[0] -= 2;
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -183,8 +183,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetMove: {x: 0, y: 0, z: 0}
   prevMove: {x: 0, y: 0, z: 0}
-  speed: 0
+  speed: 7
   player: {fileID: 382301343}
+  deathTextSize: 93
+  deathTextWidth: 1123
+  deathTextHeight: 422
+  deatTextColor: {r: 1, g: 0, b: 0.9712057, a: 1}
 --- !u!61 &382301345
 BoxCollider2D:
   m_ObjectHideFlags: 0

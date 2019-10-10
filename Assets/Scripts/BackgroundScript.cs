@@ -39,7 +39,7 @@ public class BackgroundScript : MonoBehaviour
             hasSpawned = true;
         }
 
-        if (transform.position.y <= -30f)
+        if (transform.position.y <= unitsPerPixelY * -1.02f)
             Destroy(gameObject);
     }
 
