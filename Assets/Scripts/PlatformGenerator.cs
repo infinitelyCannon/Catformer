@@ -12,12 +12,11 @@ public class PlatformGenerator : MonoBehaviour
 
     public float height;
     private float timer = 0f;
-    private int[] weights = { 3, 3, 3 };
+    private int[] weights = { 3, 3, 3};
 
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -36,7 +35,7 @@ public class PlatformGenerator : MonoBehaviour
                 if (rand <= 0)
                     break;
             }
-            Instantiate(templates[index], spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
+            Instantiate(templates[IndexToPlatform(index)], spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
             ShiftWeights(index);
         }
     }
@@ -59,15 +58,20 @@ public class PlatformGenerator : MonoBehaviour
             case 2:
                 weights[1] -= 1;
                 weights[2] -= 1;
-                weights[0] += 2;
+                weights[0] += 1;
                 break;
             case 0:
                 weights[1] += 1;
                 weights[2] += 1;
-                weights[0] -= 2;
+                weights[0] -= 1;
                 break;
             default:
                 break;
         }
+    }
+
+    int IndexToPlatform(int idx)
+    {
+        return (idx > 0) ? 1 : 0;
     }
 }

@@ -63,7 +63,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (!isDead)
         {
-            if (targetPlat != null)
+            if (targetPlat != null && targetPlat.transform.childCount > 0)
                 targetMove = targetPlat.transform.GetChild(0).position;
             transform.position = Vector3.Lerp(transform.position, targetMove, 0.1f);
             // transform.position += new Vector3(0, -1, 0) * speed * Time.deltaTime;
@@ -82,21 +82,19 @@ public class PlayerScript : MonoBehaviour
                     RaycastHit2D hit = Physics2D.BoxCast(cameraRef.ScreenToWorldPoint(touch.position), new Vector2(0.01f, 0.01f), 0, Vector2.zero);
                     if (hit.collider != null)
                     {
-                        Debug.Log("Color: " + hit.collider.gameObject.GetComponent<SpriteRenderer>().color);
-
-                        if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color == Color.white)
+                        if (hit.collider.gameObject.GetComponent<Platform>() != null && hit.collider.gameObject.GetComponent<Platform>().isGood)
                         {
-                            hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.green;
+                            //hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.green;
                             targetMove = hit.collider.transform.GetChild(0).position;
                             targetPlat = hit.collider.gameObject;
                             //transform.position = targetMove;
-                            speed = hit.collider.gameObject.GetComponent<Plaform>().speed;
+                            speed = hit.collider.gameObject.GetComponent<Platform>().speed;
 
                         }
-                        else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
+                        /*else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
                         {
                             hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.black;
-                        }
+                        }*/
                     }
                 }
             }
@@ -105,21 +103,19 @@ public class PlayerScript : MonoBehaviour
                 RaycastHit2D hit = Physics2D.BoxCast(cameraRef.ScreenToWorldPoint(Input.mousePosition), new Vector2(0.01f, 0.01f), 0, Vector2.zero);
                 if (hit.collider != null)
                 {
-                    Debug.Log("Color: " + hit.collider.gameObject.GetComponent<SpriteRenderer>().color);
-
-                    if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color == Color.white)
+                    if (hit.collider.gameObject.GetComponent<Platform>() != null && hit.collider.gameObject.GetComponent<Platform>().isGood)
                     {
-                        hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.green;
+                        //hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.green;
                         targetMove = hit.collider.transform.GetChild(0).position;
                         targetPlat = hit.collider.gameObject;
                         //transform.position = targetMove;
-                        speed = hit.collider.gameObject.GetComponent<Plaform>().speed;
+                        speed = hit.collider.gameObject.GetComponent<Platform>().speed;
 
                     }
-                    else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
+                    /*else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
                     {
                         hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.black;
-                    }
+                    }*/
                 }
             }
 

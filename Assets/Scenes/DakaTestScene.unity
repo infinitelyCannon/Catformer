@@ -405,9 +405,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   delay: 0.5
   templates:
-  - {fileID: 7648937569439407464, guid: 2982d05edbc928e46a637593e1b87ec9, type: 3}
-  - {fileID: 1917821467252019200, guid: d6fe1a0ecf6844b4e85794f6f0a0ec0f, type: 3}
-  - {fileID: 8952266815397366871, guid: 8afe779ca281f2941958345a114fd1df, type: 3}
+  - {fileID: 1612026175244242381, guid: 9de9bee7fc1038a4eac4324a5a32d357, type: 3}
+  - {fileID: 6043174587833686991, guid: 8fab08e66797cea40ae7aa78a08e89d2, type: 3}
   spawnRate: 0
   spawnPoints:
   - {fileID: 55013829}
@@ -444,21 +443,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ScrollingForest
-      objectReference: {fileID: 0}
-    - target: {fileID: 6334885967237833991, guid: efecca14f8593954cab8d1ed886a4097,
-        type: 3}
-      propertyPath: spawnZ
-      value: 20.48
-      objectReference: {fileID: 0}
-    - target: {fileID: 6334885967237833991, guid: efecca14f8593954cab8d1ed886a4097,
-        type: 3}
-      propertyPath: spawnY
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 6334885967237833991, guid: efecca14f8593954cab8d1ed886a4097,
-        type: 3}
-      propertyPath: speed
-      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1674064070846047486, guid: efecca14f8593954cab8d1ed886a4097,
         type: 3}
@@ -514,16 +498,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1674064070846047425, guid: efecca14f8593954cab8d1ed886a4097,
-        type: 3}
-      propertyPath: m_SortingLayerID
-      value: -408602881
-      objectReference: {fileID: 0}
-    - target: {fileID: 1674064070846047425, guid: efecca14f8593954cab8d1ed886a4097,
-        type: 3}
-      propertyPath: m_SortingLayer
-      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: efecca14f8593954cab8d1ed886a4097, type: 3}
@@ -685,32 +659,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8032096084067812184, guid: 0210e214255f4dd49a71bd6ae4d2f9c6,
-        type: 3}
-      propertyPath: background
-      value: 
-      objectReference: {fileID: 3916501826246040755, guid: 0210e214255f4dd49a71bd6ae4d2f9c6,
-        type: 3}
-    - target: {fileID: 8032096084067812184, guid: 0210e214255f4dd49a71bd6ae4d2f9c6,
-        type: 3}
-      propertyPath: speed
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8032096084067812184, guid: 0210e214255f4dd49a71bd6ae4d2f9c6,
-        type: 3}
-      propertyPath: spawnZ
-      value: 20.48
-      objectReference: {fileID: 0}
-    - target: {fileID: 3916501826246040716, guid: 0210e214255f4dd49a71bd6ae4d2f9c6,
-        type: 3}
-      propertyPath: m_SortingLayerID
-      value: 649720265
-      objectReference: {fileID: 0}
-    - target: {fileID: 3916501826246040716, guid: 0210e214255f4dd49a71bd6ae4d2f9c6,
-        type: 3}
-      propertyPath: m_SortingLayer
-      value: -2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0210e214255f4dd49a71bd6ae4d2f9c6, type: 3}
