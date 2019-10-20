@@ -185,6 +185,7 @@ MonoBehaviour:
   prevMove: {x: 0, y: 0, z: 0}
   speed: 7
   player: {fileID: 382301343}
+  touchRadius: 0.2
   deathTextSize: 93
   deathTextWidth: 1123
   deathTextHeight: 422
@@ -275,7 +276,7 @@ Transform:
   m_LocalScale: {x: 1.634, y: 1.699, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
@@ -643,7 +644,7 @@ PrefabInstance:
     - target: {fileID: 3916501826246040717, guid: 0210e214255f4dd49a71bd6ae4d2f9c6,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3916501826246040717, guid: 0210e214255f4dd49a71bd6ae4d2f9c6,
         type: 3}

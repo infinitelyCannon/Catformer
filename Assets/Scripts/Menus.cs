@@ -10,10 +10,15 @@ public class Menus : MonoBehaviour
     private bool hints;
 
     public GameObject[] hintImages;
+    public Sprite[] characterList;
     public GameObject startMenu;
+    public GameObject characterCat;
+    private int currentCharacter = 0;
     private void Start()
     {
         hints = true;
+        characterCat.GetComponent<Image>().sprite = characterList[0];
+
     }
     public void StartGame()
     {
@@ -46,6 +51,26 @@ public class Menus : MonoBehaviour
     public void YesHints()
     {
         hints = true;
+    }
+    public void NextCharacter()
+    {
+        if (++currentCharacter == characterList.Length)
+        {
+            currentCharacter = 0;
+        }
+        
+        Sprite current = characterList[currentCharacter];
+        characterCat.GetComponent<Image>().sprite = current;
+    }
+    public void PreviousCharacter()
+    {
+        if (--currentCharacter < 0)
+        {
+            currentCharacter = characterList.Length - 1;
+        }
+        Sprite current = characterList[currentCharacter];
+        Debug.Log(currentCharacter);
+        characterCat.GetComponent<Image>().sprite = current;
     }
     
 }

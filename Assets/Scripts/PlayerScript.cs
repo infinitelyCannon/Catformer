@@ -15,20 +15,37 @@ public class PlayerScript : MonoBehaviour
     bool isDead = false;
     float playTime = 0;
 
+    public float touchRadius;
+
     [Header("Debug Variables")]
     public int deathTextSize;
     public int deathTextWidth;
     public int deathTextHeight;
     public Color deatTextColor;
 
+    private int platformMask;
+
     // Start is called before the first frame update
     void Start()
     {
         speed = 0;
-        targetMove = transform.position;
         targetPlat = null;
         cameraRef = Camera.main;
         mRenderer = GetComponent<SpriteRenderer>();
+        platformMask = LayerMask.GetMask("Platforms");
+
+        float halfWidth = mRenderer.sprite.bounds.extents.x;
+        Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
+        Vector3 leftEdge = cameraRef.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+        Vector3 leftSpot = leftEdge + new Vector3(halfWidth, 0f, 0f);
+        Vector3 rightSpot = rightEdge - new Vector3(halfWidth, 0f, 0f);
+
+        if (transform.position.x < leftSpot.x && transform.position.x < cameraRef.transform.position.x)
+            transform.position = new Vector3(leftSpot.x, transform.position.y, 0f);
+        else if (transform.position.x > rightSpot.x && transform.position.x > cameraRef.transform.position.x)
+            transform.position = new Vector3(rightSpot.x, transform.position.y, 0f);
+
+        targetMove = transform.position;
 
         if (deathTextSize == 0)
             deathTextSize = 84;
@@ -79,17 +96,28 @@ public class PlayerScript : MonoBehaviour
 
                 if (touch.phase == TouchPhase.Began)
                 {
-                    RaycastHit2D hit = Physics2D.BoxCast(cameraRef.ScreenToWorldPoint(touch.position), new Vector2(0.01f, 0.01f), 0, Vector2.zero);
-                    if (hit.collider != null)
+                    //RaycastHit2D hit = Physics2D.BoxCast(cameraRef.ScreenToWorldPoint(touch.position), new Vector2(0.01f, 0.01f), 0, Vector2.zero);
+                    Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(touch.position), touchRadius, platformMask);
+                    if (hit != null)
                     {
-                        if (hit.collider.gameObject.GetComponent<Platform>() != null && hit.collider.gameObject.GetComponent<Platform>().isGood)
+                        if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
                         {
                             //hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.green;
-                            targetMove = hit.collider.transform.GetChild(0).position;
-                            targetPlat = hit.collider.gameObject;
+                            targetMove = hit.transform.GetChild(0).position;
+                            targetPlat = hit.gameObject;
                             //transform.position = targetMove;
-                            speed = hit.collider.gameObject.GetComponent<Platform>().speed;
-
+                            speed = hit.gameObject.GetComponent<Platform>().speed;
+                            
+                            if (hit.gameObject.GetComponent<Platform>().transform.position.x < 0.0f)
+                            {
+                                mRenderer.flipX = true;
+                                Debug.Log("should flip");
+                            }
+                            else if(hit.gameObject.GetComponent<Platform>().transform.position.x >-0.0f)
+                            {
+                                mRenderer.flipX = false;
+                                Debug.Log("should flip");
+                            }
                         }
                         /*else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
                         {
@@ -100,17 +128,27 @@ public class PlayerScript : MonoBehaviour
             }
             else if (Input.GetMouseButtonDown(0))
             {
-                RaycastHit2D hit = Physics2D.BoxCast(cameraRef.ScreenToWorldPoint(Input.mousePosition), new Vector2(0.01f, 0.01f), 0, Vector2.zero);
-                if (hit.collider != null)
+                Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(Input.mousePosition), touchRadius, platformMask);
+                if (hit != null)
                 {
-                    if (hit.collider.gameObject.GetComponent<Platform>() != null && hit.collider.gameObject.GetComponent<Platform>().isGood)
+                    if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
                     {
                         //hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.green;
-                        targetMove = hit.collider.transform.GetChild(0).position;
-                        targetPlat = hit.collider.gameObject;
+                        targetMove = hit.transform.GetChild(0).position;
+                        targetPlat = hit.gameObject;
                         //transform.position = targetMove;
-                        speed = hit.collider.gameObject.GetComponent<Platform>().speed;
+                        speed = hit.gameObject.GetComponent<Platform>().speed;
 
+                        if (hit.gameObject.GetComponent<Platform>().transform.position.x < 0.0f)
+                        {
+                            mRenderer.flipX = true;
+                            Debug.Log("should flip");
+                        }
+                        else if (hit.gameObject.GetComponent<Platform>().transform.position.x >= 0.0f)
+                        {
+                            mRenderer.flipX = false;
+                            Debug.Log("should flip");
+                        }
                     }
                     /*else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
                     {

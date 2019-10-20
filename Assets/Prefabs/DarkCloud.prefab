@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 879963064769730242}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: LandingSpace
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6043174586387218432}
   - component: {fileID: 6043174586387218439}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cloud 1 - Damage Effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 9220799339029802517}
   - component: {fileID: 4726063989734104188}
   - component: {fileID: 7206650103796455173}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: DarkCloud
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -226,6 +226,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 7
+  isGood: 0
 --- !u!61 &4726063989734104188
 BoxCollider2D:
   m_ObjectHideFlags: 0
