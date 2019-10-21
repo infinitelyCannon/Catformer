@@ -162,9 +162,10 @@ GameObject:
   - component: {fileID: 382301346}
   - component: {fileID: 382301344}
   - component: {fileID: 382301345}
+  - component: {fileID: 382301348}
   m_Layer: 0
   m_Name: CatDude
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -185,6 +186,7 @@ MonoBehaviour:
   prevMove: {x: 0, y: 0, z: 0}
   speed: 0
   player: {fileID: 382301343}
+  touchRadius: 0
   deathTextSize: 0
   deathTextWidth: 0
   deathTextHeight: 0
@@ -252,7 +254,7 @@ SpriteRenderer:
   m_SortingLayerID: 213598375
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 09709ef509e2e5d47af5b3fbd23c2805, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c5e516f65a934d043b0ed64a54c6fbd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -277,6 +279,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &382301348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382301343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b62f3c23bfc4b4147bda8c8178d70ea7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterSprites:
+  - {fileID: 21300000, guid: c5e516f65a934d043b0ed64a54c6fbd8, type: 3}
+  - {fileID: 21300000, guid: 09709ef509e2e5d47af5b3fbd23c2805, type: 3}
+  playerCat: {fileID: 382301343}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class Menus : MonoBehaviour
+public class SavedPreferences : MonoBehaviour
 {
     // Start is called before the first frame update
     private bool hints;
@@ -13,26 +13,36 @@ public class Menus : MonoBehaviour
     public Sprite[] characterList;
     public GameObject startMenu;
     public GameObject characterCat;
-    private int currentCharacter = 0;
+    public GameObject customizeCat;
+    public int currentCharacter;
+    public GameObject savedPreferences;
+
     private void Start()
     {
-        hints = true;
-        characterCat.GetComponent<Image>().sprite = characterList[0];
 
+        currentCharacter = PlayerPrefs.GetInt("CharacterSelected");
+        hints = true;
+        characterCat.GetComponent<Image>().sprite = characterList[currentCharacter];
+        customizeCat.GetComponent<Image>().sprite = characterList[currentCharacter];
+        DontDestroyOnLoad(savedPreferences);
+       
     }
     public void StartGame()
     {
         if (hints == false)
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            ChangePlayerCharacter();
+        }
         else if (hints == true)
         {
             startMenu.SetActive(false);
             for (int i = 0; i < hintImages.Length; i++)
             {
                 hintImages[i].SetActive(true);
-                
+
             }
-           
+
         }
 
     }
@@ -58,9 +68,10 @@ public class Menus : MonoBehaviour
         {
             currentCharacter = 0;
         }
-        
+
         Sprite current = characterList[currentCharacter];
         characterCat.GetComponent<Image>().sprite = current;
+        CharacterSelected();
     }
     public void PreviousCharacter()
     {
@@ -69,9 +80,22 @@ public class Menus : MonoBehaviour
             currentCharacter = characterList.Length - 1;
         }
         Sprite current = characterList[currentCharacter];
-        Debug.Log(currentCharacter);
         characterCat.GetComponent<Image>().sprite = current;
+        CharacterSelected();
     }
-    
+    public void CharacterSelected()
+    {
+        PlayerPrefs.SetInt("CharacterSelected", currentCharacter);
+    }
+    public void ChangedCharacter()
+    {
+        customizeCat.GetComponent<Image>().sprite = characterList[currentCharacter];
+        
+    }
+    public void ChangePlayerCharacter()
+    {
+        GameObject.FindGameObjectWithTag("Player").GetComponent<Image>().sprite = characterList[currentCharacter];
+    }
 }
+
 

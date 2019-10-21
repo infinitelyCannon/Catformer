@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class PlayerScript : MonoBehaviour
     public Vector3 prevMove;
     public float speed;
     public GameObject player;
+    
+
 
     GameObject targetPlat;
     bool isDead = false;
@@ -33,6 +36,7 @@ public class PlayerScript : MonoBehaviour
         cameraRef = Camera.main;
         mRenderer = GetComponent<SpriteRenderer>();
         platformMask = LayerMask.GetMask("Platforms");
+      
 
         float halfWidth = mRenderer.sprite.bounds.extents.x;
         Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
