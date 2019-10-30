@@ -92,12 +92,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00fabff0ae60a745a8a3dae4e648795, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  relativeCameraSpeed: 0.25
   type: 1
   background: {fileID: 3916501826246040755}
-  heightLimits: 050000000600000007000000f4010000
+  heightLimits: 050000000100000001000000ffffffff
   sprites:
   - {fileID: 21300000, guid: 0deaf84f6b107c8468e9e3913dcad6a1, type: 3}
   - {fileID: 21300000, guid: 4369af99c92c3854ab2ae36cbbff3d9f, type: 3}
   - {fileID: 21300000, guid: bfd321151c43cfa429bd286427eba815, type: 3}
   - {fileID: 21300000, guid: c9fd3743d7fb13740ba05b1c37d78269, type: 3}
+  unitsPerPixelX: 0
+  unitsPerPixelY: 0

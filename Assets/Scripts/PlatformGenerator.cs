@@ -4,23 +4,43 @@ using UnityEngine;
 
 public class PlatformGenerator : MonoBehaviour
 {
-    public float delay;
+    public enum SpawnUnits
+    {
+        World,
+        Camera
+    }
+
     public GameObject[] templates;
     public int spawnRate;
     public Transform[] spawnPoints;
-    public AnimationCurve animCurve;
 
     public float height;
+
+    [Header("Debug Variables")]
+    public Color SafetyZoneColor = Color.cyan;
+
     private float timer = 0f;
     private int[] weights = { 3, 3, 3};
 
+    private float SpawnHeight;
+    private PlayerScript playerRef;
+    private Camera mCamera;
+
     private const float PLATFORM_WIDTH = 17.17f * 0.2720631f;
+    private const float PLATFORM_HEIGHT = 8.29f * 0.2720631f;
+
+    private void Awake()
+    {
+        playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        Camera cameraRef = Camera.main;
-        Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
+        mCamera = Camera.main;
+
+
+        /*Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
         Vector3 leftEdge = cameraRef.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
         Vector3 leftSpot = leftEdge + new Vector3(PLATFORM_WIDTH / 2f, 0f, 0f);
         Vector3 rightSpot = rightEdge - new Vector3(PLATFORM_WIDTH / 2f, 0f, 0f);
@@ -31,12 +51,76 @@ public class PlatformGenerator : MonoBehaviour
                 spot.position = new Vector3(leftSpot.x, spot.position.y, 0f);
             else if (spot.position.x > cameraRef.transform.position.x && spot.position.x > rightSpot.x)
                 spot.position = new Vector3(rightSpot.x, spot.position.y, 0f);
-        }
+        }*/
     }
 
     // Update is called once per frame
     void Update()
     {
+        // The target the player will move to.
+        GameObject startPoint;
+
+        // The position of the green line the camera uses to follow the player
+        Vector3 followLine = mCamera.ViewportToWorldPoint(new Vector3(0.5f, mCamera.gameObject.GetComponent<CameraController>().followLine, 10f));
+
+        // The top, right, and left edges of the camera.
+        Vector3 topEdge = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10f));
+        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
+        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+
+        // On click . . .
+        if (Time.timeScale > 0 && Input.GetMouseButtonDown(0))
+        {
+            // Grab the player's target platform.
+            startPoint = playerRef.GetTarget();
+
+            // If that platform exists, it's not the player, and it's higher than the camera's follow line,
+            if(startPoint != null 
+                && startPoint != playerRef.gameObject 
+                && startPoint.transform.position.y > followLine.y)
+            {
+                /*
+                    Get the vertical distance between the platform and the follow line,
+                    and spawn a new platform somewhere inside that distance above the top of the camera.
+                    (Also picks a random X coordinate).
+                 */
+                SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
+                Instantiate(templates[0], 
+                    new Vector3(
+                        Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f)),
+                        Random.Range(topEdge.y + (PLATFORM_HEIGHT / 2f), (topEdge.y + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f
+                    ), 
+                    Quaternion.identity);
+            }
+        }
+        // Or on touch . . .
+        else if(Time.timeScale > 0 && Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Began)
+        {
+            // Grab the player's target platform.
+            startPoint = playerRef.GetTarget();
+
+            // If that platform exists, it's not the player, and it's higher than the camera's follow line,
+            if (startPoint != null
+                && startPoint != playerRef.gameObject
+                && startPoint.transform.position.y > followLine.y)
+            {
+                /*
+                    Get the vertical distance between the platform and the follow line,
+                    and spawn a new platform somewhere inside that distance above the top of the camera.
+                    (Also picks a random X coordinate).
+                 */
+                SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
+                Instantiate(templates[0],
+                    new Vector3(
+                        Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f)),
+                        Random.Range(topEdge.y + (PLATFORM_HEIGHT / 2f), (topEdge.y + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f
+                    ),
+                    Quaternion.identity);
+            }
+        }
+        /*
         timer += Time.deltaTime;
 
         if(timer >= delay)
@@ -50,10 +134,14 @@ public class PlatformGenerator : MonoBehaviour
                 if (rand <= 0)
                     break;
             }
-            Instantiate(templates[IndexToPlatform(index)], spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
+            Instantiate(templates[IndexToPlatform(0)], spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
             ShiftWeights(index);
+
         }
+        */
     }
+
+
 
     int Sum(int[] arr)
     {

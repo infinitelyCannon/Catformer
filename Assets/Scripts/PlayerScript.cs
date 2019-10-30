@@ -11,33 +11,33 @@ public class PlayerScript : MonoBehaviour
     public Vector3 prevMove;
     public float speed;
     public GameObject player;
-    
-
+    public Collider2D hitPlatform;
+    public AudioSource jumpAudio;
+    public AudioSource hurtAudio;
+    public Animator catAnimator;
+    public bool canJump;
+    public int pointsPerPlatform;
 
     GameObject targetPlat;
-    bool isDead = false;
+    [HideInInspector]
+    public bool isDead = false;
     float playTime = 0;
 
     public float touchRadius;
 
-    [Header("Debug Variables")]
-    public int deathTextSize;
-    public int deathTextWidth;
-    public int deathTextHeight;
-    public Color deatTextColor;
-
     private int platformMask;
+    private int score = 0;
+    public GameObject deathScreen;
+    public Text scoreText;
 
     // Start is called before the first frame update
     void Start()
     {
-        speed = 0;
-        targetPlat = null;
+        targetPlat = gameObject;
         cameraRef = Camera.main;
         mRenderer = GetComponent<SpriteRenderer>();
         platformMask = LayerMask.GetMask("Platforms");
-      
-
+        canJump = true;
         float halfWidth = mRenderer.sprite.bounds.extents.x;
         Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
         Vector3 leftEdge = cameraRef.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
@@ -51,42 +51,55 @@ public class PlayerScript : MonoBehaviour
 
         targetMove = transform.position;
 
-        if (deathTextSize == 0)
-            deathTextSize = 84;
-        if (deathTextWidth == 0)
-            deathTextWidth = 1100;
-        if (deathTextHeight == 0)
-            deathTextHeight = 420;
-        if (deatTextColor == Color.clear)
-            deatTextColor = Color.magenta;
+        // Insert the pause and death screens if they don't exist.
+        if (deathScreen == null && scoreText == null)
+        {
+            Instantiate(Resources.Load("GameHUD", typeof(GameObject)), Vector3.zero, Quaternion.identity);
+            Instantiate(Resources.Load("EventSystem", typeof(GameObject)), Vector3.zero, Quaternion.identity);
+
+            deathScreen = GameObject.Find("DeathOverlay");
+            scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
+        }
+
+        if (pointsPerPlatform == 0)
+            pointsPerPlatform = 20;
     }
 
     private void OnBecameInvisible()
     {
+        System.TimeSpan secs = System.TimeSpan.FromSeconds(playTime);
+        if (deathScreen == null)
+            return;
+        Text deathText = deathScreen.GetComponentInChildren<Text>();
+        
         isDead = true;
+        hurtAudio.Play();
+        deathScreen.SetActive(true);
+        deathText.text = "Game Over\nฅ(＾x ω x＾ฅ)∫\nScore: " + score + "\nTotal Time: " + secs.ToString(@"hh\:mm\:ss\:fff");
     }
 
     private void OnGUI()
     {
-        if (isDead)
-        {
-            System.TimeSpan t = System.TimeSpan.FromSeconds(playTime);
-
-            GUI.color = deatTextColor;
-            GUIStyle skin = new GUIStyle(GUI.skin.label);
-            skin.fontSize = deathTextSize;
-            GUI.Label(new Rect((cameraRef.pixelWidth / 2) - (deathTextWidth/2), cameraRef.pixelHeight / 2, deathTextWidth, deathTextHeight), "You Died ฅ(＾x ω x＾ฅ)∫\nTotal Time: " + t.ToString(@"hh\:mm\:ss\:fff"), skin);
-        }
+        
     }
+
+
 
     // Update is called once per frame
     void Update()
     {
-        if (!isDead)
+        if (!isDead && Time.timeScale > 0)
         {
             if (targetPlat != null && targetPlat.transform.childCount > 0)
                 targetMove = targetPlat.transform.GetChild(0).position;
-            transform.position = Vector3.Lerp(transform.position, targetMove, 0.1f);
+            if (targetPlat == null)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, new Vector3(0, -50f, 10f), speed * Time.deltaTime);
+                canJump = false;
+            }
+            else
+                transform.position = Vector3.MoveTowards(transform.position, targetMove, speed * Time.deltaTime);
+
             // transform.position += new Vector3(0, -1, 0) * speed * Time.deltaTime;
 
             if (transform.parent != null)
@@ -100,9 +113,10 @@ public class PlayerScript : MonoBehaviour
 
                 if (touch.phase == TouchPhase.Began)
                 {
+                    
                     //RaycastHit2D hit = Physics2D.BoxCast(cameraRef.ScreenToWorldPoint(touch.position), new Vector2(0.01f, 0.01f), 0, Vector2.zero);
                     Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(touch.position), touchRadius, platformMask);
-                    if (hit != null)
+                    if (hit != null && canJump == true)
                     {
                         if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
                         {
@@ -110,17 +124,22 @@ public class PlayerScript : MonoBehaviour
                             targetMove = hit.transform.GetChild(0).position;
                             targetPlat = hit.gameObject;
                             //transform.position = targetMove;
-                            speed = hit.gameObject.GetComponent<Platform>().speed;
-                            
+                            //speed = hit.gameObject.GetComponent<Platform>().speed;
+                            //hit = hitPlatform;
+                            jumpAudio.Play();
+                            catAnimator.SetBool("isJumping", true);
+                            score += pointsPerPlatform;
+                            scoreText.text = "Score: " + score;
+
                             if (hit.gameObject.GetComponent<Platform>().transform.position.x < 0.0f)
                             {
                                 mRenderer.flipX = true;
-                                Debug.Log("should flip");
+                                //Debug.Log("should flip");
                             }
                             else if(hit.gameObject.GetComponent<Platform>().transform.position.x >-0.0f)
                             {
                                 mRenderer.flipX = false;
-                                Debug.Log("should flip");
+                                //Debug.Log("should flip");
                             }
                         }
                         /*else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
@@ -132,8 +151,9 @@ public class PlayerScript : MonoBehaviour
             }
             else if (Input.GetMouseButtonDown(0))
             {
+                
                 Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(Input.mousePosition), touchRadius, platformMask);
-                if (hit != null)
+                if (hit != null && canJump == true)
                 {
                     if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
                     {
@@ -141,18 +161,24 @@ public class PlayerScript : MonoBehaviour
                         targetMove = hit.transform.GetChild(0).position;
                         targetPlat = hit.gameObject;
                         //transform.position = targetMove;
-                        speed = hit.gameObject.GetComponent<Platform>().speed;
+                        jumpAudio.Play();
+                        catAnimator.SetBool("isJumping", true);
+                        //speed = hit.gameObject.GetComponent<Platform>().speed;
+                        score += pointsPerPlatform;
+                        scoreText.text = "Score: " + score;
+                        
 
-                        if (hit.gameObject.GetComponent<Platform>().transform.position.x < 0.0f)
+                        if (targetMove.x/*hit.gameObject.GetComponent<Platform>().transform.position.x*/ < 0.0f)
                         {
                             mRenderer.flipX = true;
                             Debug.Log("should flip");
                         }
-                        else if (hit.gameObject.GetComponent<Platform>().transform.position.x >= 0.0f)
+                        if (targetMove.x/*hit.gameObject.GetComponent<Platform>().transform.position.x*/ >= 0.0f)
                         {
                             mRenderer.flipX = false;
                             Debug.Log("should flip");
                         }
+                        Debug.Log("???");
                     }
                     /*else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
                     {
@@ -163,6 +189,20 @@ public class PlayerScript : MonoBehaviour
 
             playTime += Time.deltaTime;
         }
+        
     }
- 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject == targetPlat)
+        {
+            catAnimator.SetBool("isJumping", false);
+            mRenderer.flipX = (targetMove.x < 0.0f);
+        }
+        
+    }
+
+    public GameObject GetTarget()
+    {
+        return targetPlat;
+    }
 }

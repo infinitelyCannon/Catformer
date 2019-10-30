@@ -10,7 +10,7 @@ public class BackgroundScript : MonoBehaviour
         Background
     };
 
-    public float speed;
+    public float relativeCameraSpeed;
     public BackgroundType type;
     public GameObject background;
 
@@ -20,13 +20,16 @@ public class BackgroundScript : MonoBehaviour
     //public int[] heightTriggers;
     //public Sprite[] sprites;
 
-    Camera mCamera;
     protected static int foregroundSpawns = 0;
     protected static int backgroundSpawns = 0;
 
     //private float distance;
+    private Vector3 screenTop;
     private Vector3 screenBottom;
-    bool hasSpawned = false;
+    private bool hasSpawned = false;
+    private Camera mCamera;
+    private CameraController cameraController;
+    private float speed = 0f;
 
     //private float ASPECT_RATIO;
     private float unitsPerPixelX;
@@ -37,8 +40,9 @@ public class BackgroundScript : MonoBehaviour
     {
         SpriteRenderer renderer = GetComponent<SpriteRenderer>();
         mCamera = Camera.main;
+        cameraController = mCamera.gameObject.GetComponent<CameraController>();
         //distance = Vector3.Distance(mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0)), Vector3.zero);
-        screenBottom = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0, 10));
+        screenTop = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10));
         unitsPerPixelX = renderer.sprite.texture.width / renderer.sprite.pixelsPerUnit;
         unitsPerPixelY = renderer.sprite.texture.height / renderer.sprite.pixelsPerUnit;
         //ASPECT_RATIO = (float)renderer.sprite.texture.width / renderer.sprite.texture.height;
@@ -48,47 +52,69 @@ public class BackgroundScript : MonoBehaviour
             foregroundSpawns++;
         else
             backgroundSpawns++;
+
+        if (heightLimits[0] > 0)
+            heightLimits[0]--;
     }
 
     // Update is called once per frame
     void Update()
     {
+        speed = cameraController.getVelocity().magnitude * relativeCameraSpeed;
+        screenTop = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10));
         transform.position += new Vector3(0, -1f) * speed * Time.deltaTime;
-        if (Vector3.Distance(screenBottom, transform.position) <= 3f && !hasSpawned)
+
+        //if (Mathf.Abs(screenTop.y - (transform.position.y + (unitsPerPixelY / 2f) * transform.localScale.y)) <= 1f && !hasSpawned)
+        if(!hasSpawned && heightLimits[0] >= 0)
         {
-            if(type == BackgroundType.Foreground)
+            if (type == BackgroundType.Foreground)
             {
-                if(foregroundSpawns >= heightLimits[0] && heightLimits.Count > 1 && sprites.Count > 1)
+                if (heightLimits[0] == 0 && heightLimits.Count > 1 && sprites.Count > 1)
                 {
-                    GameObject newBG = Instantiate(background, new Vector3(transform.position.x, transform.position.y + /*38f*/(unitsPerPixelY * transform.localScale.y), 0), Quaternion.identity);
+                    GameObject newBG = Instantiate(gameObject, new Vector3(transform.position.x, transform.position.y + /*38f*/(unitsPerPixelY * transform.localScale.y), 0), Quaternion.identity);
                     sprites.RemoveAt(0);
                     heightLimits.RemoveAt(0);
+                    newBG.name = "Foreground " + foregroundSpawns;
                     newBG.GetComponent<BackgroundScript>().SetSprite(1);
                     newBG.GetComponent<BackgroundScript>().sprites = new List<Sprite>(sprites);
                     newBG.GetComponent<BackgroundScript>().heightLimits = new List<int>(heightLimits);
                 }
-                else if(foregroundSpawns < heightLimits[0])
-                    Instantiate(background, new Vector3(transform.position.x, transform.position.y + /*38f*/(unitsPerPixelY * transform.localScale.y), 0), Quaternion.identity);
+                else if (heightLimits[0] > 0)
+                {
+                    GameObject newBG = Instantiate(gameObject, new Vector3(transform.position.x, transform.position.y + /*38f*/(unitsPerPixelY * transform.localScale.y), 0), Quaternion.identity);
+                    newBG.name = "Foreground " + foregroundSpawns;
+                } 
             }
             else
             {
-                if (backgroundSpawns >= heightLimits[0] && heightLimits.Count > 1 && sprites.Count > 1)
+                if (heightLimits[0] == 0 && heightLimits.Count > 1 && sprites.Count > 1)
                 {
                     GameObject newBG = Instantiate(background, new Vector3(transform.position.x, transform.position.y + /*38f*/(unitsPerPixelY * transform.localScale.y), 0), Quaternion.identity);
                     sprites.RemoveAt(0);
                     heightLimits.RemoveAt(0);
+                    newBG.name = "Background " + backgroundSpawns;
                     newBG.GetComponent<BackgroundScript>().SetSprite(1);
                     newBG.GetComponent<BackgroundScript>().sprites = new List<Sprite>(sprites);
                     newBG.GetComponent<BackgroundScript>().heightLimits = new List<int>(heightLimits);
                 }
-                else if(backgroundSpawns < heightLimits[0])
-                    Instantiate(background, new Vector3(transform.position.x, transform.position.y + /*38f*/(unitsPerPixelY * transform.localScale.y), 0), Quaternion.identity);
+                else if (heightLimits[0] > 0)
+                {
+                    GameObject newBG = Instantiate(gameObject, new Vector3(transform.position.x, transform.position.y + /*38f*/(unitsPerPixelY * transform.localScale.y), 0), Quaternion.identity);
+                    newBG.name = "Background " + backgroundSpawns;
+                }
             }
-            
+
+            hasSpawned = true;
+        }
+        else if(Mathf.Abs(screenTop.y - (transform.position.y + (unitsPerPixelY / 2f) * transform.localScale.y)) <= 1f && !hasSpawned)
+        {
+            GameObject newBG = Instantiate(gameObject, new Vector3(transform.position.x, transform.position.y + /*38f*/(unitsPerPixelY * transform.localScale.y), 0), Quaternion.identity);
+            newBG.name = (type == BackgroundType.Background ? "Background " + backgroundSpawns % 2 : "Foreground " + foregroundSpawns % 2);
             hasSpawned = true;
         }
 
-        if (transform.position.y <= unitsPerPixelY * -1.02f)
+        screenBottom = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0, 10));
+        if (screenBottom.y > (transform.position.y + (unitsPerPixelY / 2f) * transform.localScale.y))
             Destroy(gameObject);
     }
 
