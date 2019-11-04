@@ -10,7 +10,15 @@ public class BackgroundResize : MonoBehaviour
     private Camera mCamera;
     private CameraController cameraController;
 
+    private float dist;
+
     // Start is called before the first frame update
+    //private void Awake()
+    //{
+    //    dist = Vector3.Distance(transform.position, Camera.main.transform.position);
+    //    Camera.main.transform.position = new Vector3(0, transform.position.y - dist, -10f);
+    //}
+
     void Start()
     {
         SpriteRenderer renderer = GetComponent<SpriteRenderer>();

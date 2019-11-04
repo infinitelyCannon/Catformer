@@ -1047,6 +1047,7 @@ MonoBehaviour:
   hazardWarningRight: {fileID: 628565903}
   selectHazard: 0
   timeLeft: 5
+  planeSpawnNow: 0
 --- !u!1 &1326220106 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4534799279237491391, guid: 31fbc5deede4332408a682bef5416aa2,
