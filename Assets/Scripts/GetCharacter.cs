@@ -10,7 +10,6 @@ public class GetCharacter : MonoBehaviour
     private int currentCharacter;
     public GameObject playerCat;
     public string spriteSheetName;
-    public string Hello;
 
     void Start()
     {
@@ -22,7 +21,7 @@ public class GetCharacter : MonoBehaviour
     
     void LateUpdate()
     {
-        spriteSheetName = PlayerPrefs.GetString("AnimationSelected");
+        //spriteSheetName = PlayerPrefs.GetString("AnimationSelected");
         var subSprites = Resources.LoadAll<Sprite>("Characters/" + spriteSheetName);
 
         foreach (var renderer in GetComponentsInChildren<SpriteRenderer>())

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
-{   
+{
+    public float elevationMultiplier = 1.0f;
+    
     [Tooltip("How long it takes to reach the player while moving\n0 means snap to immediately.")]
     public float damping;
 
@@ -35,6 +37,7 @@ public class CameraController : MonoBehaviour
         {
             Vector3 newPos = Vector3.SmoothDamp(new Vector3(0f, transform.position.y, -Z_POS), new Vector3(0f, playerRef.position.y, -Z_POS), ref currentVelocity, damping);
             transform.position = newPos;
+            playerRef.gameObject.GetComponent<Catformer.PlayerScript>().AddToScore(currentVelocity.magnitude * elevationMultiplier);
         }
     }
 

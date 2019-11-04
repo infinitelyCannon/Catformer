@@ -24,13 +24,15 @@ public class TimeManager : MonoBehaviour
         if (Time.timeScale < 1f)
         {
             background.color = Color.clear;
-            transform.GetChild(0).gameObject.SetActive(false);
+            for(int i = 0; i < transform.childCount; i++)
+                transform.GetChild(i).gameObject.SetActive(false);
             Time.timeScale = 1f;
         }
         else if (Time.timeScale > 0)
         {
             background.color = new Color(1, 1, 1, 0.55f);
-            transform.GetChild(0).gameObject.SetActive(true);
+            for (int j = 0; j < transform.childCount; j++)
+                transform.GetChild(j).gameObject.SetActive(true);
             Time.timeScale = 0f;
         }
     }

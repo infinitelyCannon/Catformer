@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Catformer;
 
 public class PlatformGenerator : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class PlatformGenerator : MonoBehaviour
     public GameObject[] templates;
     public int spawnRate;
     public Transform[] spawnPoints;
+    public GameObject[] templatesCloud;
 
     public float height;
 
@@ -29,6 +31,17 @@ public class PlatformGenerator : MonoBehaviour
     private const float PLATFORM_WIDTH = 17.17f * 0.2720631f;
     private const float PLATFORM_HEIGHT = 8.29f * 0.2720631f;
 
+    private GameObject platformInstance; //Matt: To be called in the platform script
+    private GameObject[] platformInstances;
+    private Vector3 spawnVector;
+    public float spawnDist = 0f;
+
+    private Vector3 spawnVectorHazard;
+    public GameObject[] hazardPrefabs;
+    private GameObject hazardInstance;
+
+    private float elevation = 0f;
+
     private void Awake()
     {
         playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
@@ -38,20 +51,7 @@ public class PlatformGenerator : MonoBehaviour
     void Start()
     {
         mCamera = Camera.main;
-
-
-        /*Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
-        Vector3 leftEdge = cameraRef.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
-        Vector3 leftSpot = leftEdge + new Vector3(PLATFORM_WIDTH / 2f, 0f, 0f);
-        Vector3 rightSpot = rightEdge - new Vector3(PLATFORM_WIDTH / 2f, 0f, 0f);
-
-        foreach(Transform spot in spawnPoints)
-        {
-            if (spot.position.x < cameraRef.transform.position.x && spot.position.x < leftSpot.x)
-                spot.position = new Vector3(leftSpot.x, spot.position.y, 0f);
-            else if (spot.position.x > cameraRef.transform.position.x && spot.position.x > rightSpot.x)
-                spot.position = new Vector3(rightSpot.x, spot.position.y, 0f);
-        }*/
+        platformInstances = new GameObject[spawnPoints.Length];
     }
 
     // Update is called once per frame
@@ -85,13 +85,22 @@ public class PlatformGenerator : MonoBehaviour
                     (Also picks a random X coordinate).
                  */
                 SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
-                Instantiate(templates[0], 
-                    new Vector3(
-                        Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f)),
+                //Holds random spawn vector
+                elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
+                if (elevation > 160f)
+                    SpawnClouds(topEdge.y);
+                else
+                    SpawnPlatforms(topEdge.y);
+                //SpawnHazard(topEdge.y);
+                /*spawnVector = new Vector3(
+                        spawnPoints[Random.Range(0, spawnPoints.Length)].position.x Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f)),
                         Random.Range(topEdge.y + (PLATFORM_HEIGHT / 2f), (topEdge.y + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f
-                    ), 
-                    Quaternion.identity);
+                        0f);
+
+                if (platformInstance == null || spawnVector.y - platformInstance.transform.position.y> spawnDist) //Matt
+                {
+                    platformInstance = Instantiate(templates[0], spawnVector, Quaternion.identity) as GameObject;
+                }*/
             }
         }
         // Or on touch . . .
@@ -111,37 +120,60 @@ public class PlatformGenerator : MonoBehaviour
                     (Also picks a random X coordinate).
                  */
                 SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
-                Instantiate(templates[0],
-                    new Vector3(
-                        Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f)),
-                        Random.Range(topEdge.y + (PLATFORM_HEIGHT / 2f), (topEdge.y + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f
-                    ),
-                    Quaternion.identity);
+                //Finds elevation to reference transitions
+                elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
+                if (elevation > 180f)
+                    SpawnClouds(topEdge.y);
+                else
+                    SpawnPlatforms(topEdge.y);
+                //SpawnHazard(topEdge.y);
             }
         }
-        /*
-        timer += Time.deltaTime;
-
-        if(timer >= delay)
-        {
-            timer -= timer;
-            int rand = Random.Range(1, Sum(weights) + 1);
-            int index;
-            for(index = 0; index < templates.Length; index++)
-            {
-                rand -= weights[index];
-                if (rand <= 0)
-                    break;
-            }
-            Instantiate(templates[IndexToPlatform(0)], spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
-            ShiftWeights(index);
-
-        }
-        */
     }
 
+    void SpawnPlatforms(float topEdgeY)
+    {
+        for(int i = 0; i<spawnPoints.Length; i++)
+        {
+            spawnVector = new Vector3(
+                        Random.Range(spawnPoints[i].position.x, spawnPoints[i].position.x) /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f);
 
+            if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
+            {
+                platformInstances[i] = Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity) as GameObject;
+            }
+        }
+    }
+
+    void SpawnClouds(float topEdgeY)
+    {
+        for (int i = 0; i < spawnPoints.Length; i++)
+        {
+            spawnVector = new Vector3(
+                        Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f) /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f);
+
+            if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
+            {
+                platformInstances[i] = Instantiate(templatesCloud[Random.Range(0, templatesCloud.Length)], spawnVector, Quaternion.identity) as GameObject;
+            }
+        }
+    }
+
+    void SpawnHazard(float topEdgeY)
+    {
+        spawnVectorHazard = new Vector3(
+            0f,
+            Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+            0f);
+        if(hazardInstance == null || spawnVector.y - hazardInstance.transform.position.y > spawnDist)
+        {
+            hazardInstance = Instantiate(hazardPrefabs[0], spawnVectorHazard, Quaternion.identity) as GameObject;
+        }
+    }
 
     int Sum(int[] arr)
     {

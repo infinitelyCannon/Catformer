@@ -123,9 +123,10 @@ GameObject:
   - component: {fileID: 9220799339029802517}
   - component: {fileID: 4726063989734104188}
   - component: {fileID: 7206650103796455173}
+  - component: {fileID: 7571978940289118806}
   m_Layer: 9
   m_Name: DarkCloud
-  m_TagString: Untagged
+  m_TagString: PPHazard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -220,13 +221,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6043174587833686991}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81c6f56cb2c00854d90f2e7465917ad1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 7
   isGood: 0
+  timeLeft: 3
+  playerPresent: 0
 --- !u!61 &4726063989734104188
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -274,3 +277,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &7571978940289118806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6043174587833686991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72d2ac5defc0c46468b1dddb2ceae527, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 1
+  caughtSpace: {fileID: 0}
+  birdSound: {fileID: 0}

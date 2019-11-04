@@ -10,6 +10,13 @@ public class BackgroundScript : MonoBehaviour
         Background
     };
 
+    public enum Stage
+    {
+        Forest,
+        Sky,
+        Space
+    };
+
     public float relativeCameraSpeed;
     public BackgroundType type;
     public GameObject background;
@@ -130,5 +137,19 @@ public class BackgroundScript : MonoBehaviour
     public void SetSprite(int index)
     {
         GetComponent<SpriteRenderer>().sprite = sprites[index];
+    }
+
+    public Stage GetStage()
+    {
+        if (sprites[0].name.Contains("Forest"))
+        {
+            return Stage.Forest;
+        }
+        else if (sprites[0].name.Contains("Sky"))
+        {
+            return Stage.Sky;
+        }
+        else
+            return Stage.Sky;
     }
 }

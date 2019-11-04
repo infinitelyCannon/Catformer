@@ -6,7 +6,7 @@ public class Platform : MonoBehaviour
 {
     public float speed;
     public bool isGood;
-    float timeLeft = 3;
+    public float timeLeft = 3;
     float InitialTimeLeft;
     public bool playerPresent;
     SpriteRenderer platformRenderer;
@@ -31,6 +31,18 @@ public class Platform : MonoBehaviour
             mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10)),
             mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10))
         ));
+
+        Catformer.PlayerScript player = GameObject.FindGameObjectWithTag("Player").GetComponent<Catformer.PlayerScript>();
+        if(player.GetScore() >= 160f)
+        {
+            timeLeft = 2f;
+            InitialTimeLeft = 2f;
+        }
+        else if(player.GetScore() >= 300f)
+        {
+            timeLeft = 1f;
+            InitialTimeLeft = 1f;
+        }
     }
 
     // Update is called once per frame
@@ -64,16 +76,11 @@ public class Platform : MonoBehaviour
             
             if (particles != null && !particles.isPlaying)
             {
-                particles.Play();
+                //particles.Play();
             }
 
             if (animator != null)
                 animator.SetTrigger("Zapp");
-
-            if (isGood == true)
-            {
-                playerPresent = true;
-            }
         }
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -83,11 +90,12 @@ public class Platform : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (playerPresent == true)
+        GameObject playerRef = GameObject.FindGameObjectWithTag("Player");
+        if (isGood == true && collision.gameObject.CompareTag("Player") && playerRef.GetComponent<Catformer.PlayerScript>().GetTarget() == gameObject)
         {
-            //Instantiate(gameObject, new Vector3(SpawnGrid[12].x, SpawnGrid[12].y + mCamera.transform.position.y + camHeight / 3f, 0), Quaternion.identity);
-            //StartCoroutine(FadeOut());
+            playerPresent = true;
         }
+        particles.Play();
     }
 
     private void OnTriggerStay2D(Collider2D collision)
