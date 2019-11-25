@@ -16,7 +16,8 @@ public class PlatformGenerator : MonoBehaviour
     public Transform[] spawnPoints;
     public GameObject[] templatesCloud;
 
-    public float height;
+    public float cloudHeight;
+    public float spaceHeight;
 
     [Header("Debug Variables")]
     public Color SafetyZoneColor = Color.cyan;
@@ -87,7 +88,7 @@ public class PlatformGenerator : MonoBehaviour
                 SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
                 //Holds random spawn vector
                 elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
-                if (elevation > 160f)
+                if (elevation >= cloudHeight)
                     SpawnClouds(topEdge.y);
                 else
                     SpawnPlatforms(topEdge.y);
@@ -122,7 +123,7 @@ public class PlatformGenerator : MonoBehaviour
                 SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
                 //Finds elevation to reference transitions
                 elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
-                if (elevation > 180f)
+                if (elevation > cloudHeight)
                     SpawnClouds(topEdge.y);
                 else
                     SpawnPlatforms(topEdge.y);
@@ -133,17 +134,37 @@ public class PlatformGenerator : MonoBehaviour
 
     void SpawnPlatforms(float topEdgeY)
     {
-        for(int i = 0; i<spawnPoints.Length; i++)
+        int spot = Random.Range(1, 4);
+
+        if(spot == 1)
         {
             spawnVector = new Vector3(
-                        Random.Range(spawnPoints[i].position.x, spawnPoints[i].position.x) /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        spawnPoints[0].position.x /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
                         Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
                         0f);
+            Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
+        }
+        else if (spot == 2)
+        {
+            spawnVector = new Vector3(
+                        spawnPoints[1].position.x /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f);
+            Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
+        }
+        else // spot == 3
+        {
+            spawnVector = new Vector3(
+                        spawnPoints[0].position.x /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f);
+            Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
 
-            if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
-            {
-                platformInstances[i] = Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity) as GameObject;
-            }
+            spawnVector = new Vector3(
+                        spawnPoints[1].position.x /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f);
+            Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
         }
     }
 

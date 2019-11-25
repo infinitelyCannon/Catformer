@@ -4,34 +4,22 @@ using UnityEngine;
 
 public class BackgroundResize : MonoBehaviour
 {
-    private float unitsPerPixelX;
-    private float unitsPerPixelY;
-
     private Camera mCamera;
     private CameraController cameraController;
+    private Vector3 size;
+    private SpriteRenderer mRenderer;
 
     private float dist;
 
-    // Start is called before the first frame update
-    //private void Awake()
-    //{
-    //    dist = Vector3.Distance(transform.position, Camera.main.transform.position);
-    //    Camera.main.transform.position = new Vector3(0, transform.position.y - dist, -10f);
-    //}
-
     void Start()
     {
-        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
         mCamera = Camera.main;
+        mRenderer = GetComponent<SpriteRenderer>();
+        size = mRenderer.sprite.bounds.size * transform.localScale.x;
         cameraController = mCamera.gameObject.GetComponent<CameraController>();
-        //distance = Vector3.Distance(mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0)), Vector3.zero);
-        //screenTop = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10));
-        unitsPerPixelX = renderer.sprite.texture.width / renderer.sprite.pixelsPerUnit;
-        unitsPerPixelY = renderer.sprite.texture.height / renderer.sprite.pixelsPerUnit;
-        //ASPECT_RATIO = (float)renderer.sprite.texture.width / renderer.sprite.texture.height;
         Resize();
 
-        GameObject.Find("ScrollingForest").transform.position = new Vector3(0, transform.position.y + (unitsPerPixelY * transform.localScale.y), 0);
+        transform.position = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10f));
     }
 
     // Update is called once per frame
@@ -44,8 +32,9 @@ public class BackgroundResize : MonoBehaviour
     {
         Vector3 left = mCamera.ViewportToWorldPoint(new Vector3(0, 0.5f, 10f));
         Vector3 right = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
-        float xSize = Vector3.Distance(left, right) / unitsPerPixelX;
+        float scale = Vector3.Distance(left, right) / size.x;
 
-        transform.localScale = new Vector3(xSize, xSize, 1f);
+        transform.localScale = new Vector3(scale, scale, 1f);
+        size = mRenderer.sprite.bounds.size * transform.localScale.x;
     }
 }
