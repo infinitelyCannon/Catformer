@@ -6,28 +6,31 @@ public class BackgroundScroller : MonoBehaviour
 {
     public enum Stage
     {
+        Ground,
         Forest,
+        ForestToSky,
         Sky,
+        SkyToSpace,
         Space
     };
 
+    [System.Serializable]
+    public class BackgroundStage
+    {
+        public Sprite sprite;
+        public int times;
+    };
+
     public float speed;
+    public GameObject secondBackground;
+    public BackgroundStage[] backgroundStages;
 
     private Vector3 size;
     private Camera mCamera;
     private SpriteRenderer mRenderer;
-    private SpriteRenderer childRenderer;
-    private Vector3 startPosition;
-    [Range(-37.97551872f, 37.97551872f)]
-    public float mTime = 0f;
+    private int stageIndex = 0;
+    private SpriteRenderer secondRenderer;
     private Stage stage = Stage.Forest;
-    private bool isParentAlone = true;
-    private bool isChildAlone = false;
-    private GameObject child;
-
-    private const float REPEAT_OFFSET = 0.01f;
-
-    float newSpot;
 
     // Start is called before the first frame update
     void Start()
@@ -35,45 +38,95 @@ public class BackgroundScroller : MonoBehaviour
         mRenderer = GetComponent<SpriteRenderer>();
         mCamera = Camera.main;
         size = mRenderer.sprite.bounds.size * transform.localScale.x;
-        child = transform.GetChild(0).gameObject;
-        childRenderer = child.GetComponent<SpriteRenderer>();
-        child.GetComponent<BackgroundChild>().invisibilityTrigger = new BackgroundChild.InvisibilityTrigger(this.OnChildBecameInvisible);
+        secondRenderer = secondBackground.GetComponent<SpriteRenderer>();
 
         Resize();
-        transform.position = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10f)) + Vector3.up * size.y;
-        mTime = size.y - REPEAT_OFFSET;
+        transform.position = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10f)) + Vector3.up * size.y / 2f;
+        secondBackground.transform.position = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10f)) + Vector3.up * (size.y + size.y / 2f);
     }
 
     // Update is called once per frame
     void Update()
     {
         //Movement: Find out where the camera is and if it's moving, loop the background around the camera.
-        startPosition = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10f));//.transform.position + new Vector3(0,0,10f);
         float cameraSpeed = mCamera.GetComponent<CameraController>().getVelocity().magnitude;
-        //mTime += Time.deltaTime * cameraSpeed * -speed;
-        newSpot = mTime % size.y; //Mathf.Repeat(mTime, size.y);
-        transform.position = startPosition + Vector3.up * newSpot;
+        Vector3 cameraBottom = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10f));
+        transform.position += Vector3.up * cameraSpeed * Time.deltaTime * -speed;
+        secondBackground.transform.position += Vector3.up * cameraSpeed * Time.deltaTime * -speed;
 
-        isParentAlone = mRenderer.isVisible && !(mRenderer.isVisible && childRenderer.isVisible);
-        isChildAlone = childRenderer.isVisible && !(mRenderer.isVisible && childRenderer.isVisible);
+        if(Vector3.Distance(transform.position, cameraBottom) >= size.y / 2f && transform.position.y < mCamera.transform.position.y)
+        {
+            transform.position = secondBackground.transform.position + new Vector3(0f, size.y, 0f);
+            CheckStage(true);
+        }
+        else if (Vector3.Distance(secondBackground.transform.position, cameraBottom) >= size.y / 2f && secondBackground.transform.position.y < mCamera.transform.position.y)
+        {
+            secondBackground.transform.position = transform.position + new Vector3(0f, size.y, 0f);
+            CheckStage(false);
+        }
     }
 
-    public void OnChildBecameInvisible()
+    private void CheckStage(bool checkFirstImage)
     {
-        Debug.Log("CHILD");
+        SpriteRenderer renderer;
+        if (checkFirstImage)
+            renderer = mRenderer;
+        else
+            renderer = secondRenderer;
+
+        if (backgroundStages[stageIndex].times > 0)
+        {
+            if (backgroundStages[stageIndex].times - 1 <= 0)
+            {
+                stageIndex++;
+                renderer.sprite = backgroundStages[stageIndex].sprite;
+            }
+            else
+                backgroundStages[stageIndex].times -= 1;
+        }
+        else
+        {
+            renderer.sprite = backgroundStages[stageIndex].sprite;
+        }
     }
 
-    private void OnBecameInvisible()
+    public Stage GetStage()
     {
-        Debug.Log("PARENT");
+        return stage;
     }
 
+    private float LoopFloat(float value, float min, float max)
+    {
+        if (value <= max && value >= min)
+            return value;
+
+        float distance = max - min;
+
+        if(value >= 0)
+        {
+            while (value > distance)
+                value -= distance;
+        }
+        else
+        {
+            while (Mathf.Abs(value) > distance)
+                value += distance;
+        }
+
+        if (value < min)
+            return max - Mathf.Abs(min - value);
+            
+        if (value > max)
+            return min + Mathf.Abs(max - value);
+
+        return value;
+    }
     private void OnGUI()
     {
-        GUIStyle style = new GUIStyle(GUI.skin.GetStyle("Label"));
-        style.fontSize = 62;
-        GUI.Label(new Rect(500, 500, 700, 500), mTime.ToString(), style);
-        GUI.Label(new Rect(500, 800, 700, 500), newSpot.ToString(), style);
+        //GUIStyle style = new GUIStyle(GUI.skin.GetStyle("Label"));
+        //style.fontSize = 62;
+        //GUI.Label(new Rect(500, 500, 700, 500), mTime.ToString(), style);
+        //GUI.Label(new Rect(500, 700, 700, 500), newSpot.ToString(), style);
     }
 
     void Resize()
@@ -83,6 +136,7 @@ public class BackgroundScroller : MonoBehaviour
         float scale = Vector3.Distance(left, right) / size.x;
 
         transform.localScale = new Vector3(scale, scale, 1f);
+        secondBackground.transform.localScale = new Vector3(scale, scale, 1f);
         size = mRenderer.sprite.bounds.size * transform.localScale.x;
     }
 }
