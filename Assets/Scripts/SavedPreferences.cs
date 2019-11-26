@@ -89,7 +89,7 @@ using UnityEngine.SceneManagement;
             //stop overlapping music playing from start menu to game scene
             musicAudio.Stop();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-            ChangeBGM();
+            //ChangeBGM();
         }
         public void NoHints()
         {

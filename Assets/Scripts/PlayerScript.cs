@@ -29,6 +29,7 @@ namespace Catformer
 
         private int platformMask;
         private float score = 0;
+        private Vector3 lastPosition;
 
         public GameObject deathScreen;
         public Text scoreText;
@@ -40,6 +41,7 @@ namespace Catformer
             cameraRef = Camera.main;
             mRenderer = GetComponent<SpriteRenderer>();
             platformMask = LayerMask.GetMask("Platforms");
+            lastPosition = transform.position;
             canJump = true;
             float halfWidth = mRenderer.sprite.bounds.extents.x;
             Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
@@ -97,6 +99,8 @@ namespace Catformer
         // Update is called once per frame
         void Update()
         {
+            score += transform.position.y - lastPosition.y;
+            lastPosition = transform.position;
             if (!isDead && Time.timeScale > 0)
             {
                 if (targetPlat != null && targetPlat.transform.childCount > 1)
@@ -108,8 +112,6 @@ namespace Catformer
                 }
                 else
                     transform.position = Vector3.MoveTowards(transform.position, targetMove, speed * Time.deltaTime);
-
-                // transform.position += new Vector3(0, -1, 0) * speed * Time.deltaTime;
 
                 if (transform.parent != null)
                 {
@@ -123,7 +125,6 @@ namespace Catformer
                     if (touch.phase == TouchPhase.Began)
                     {
 
-                        //RaycastHit2D hit = Physics2D.BoxCast(cameraRef.ScreenToWorldPoint(touch.position), new Vector2(0.01f, 0.01f), 0, Vector2.zero);
                         Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(touch.position), touchRadius, platformMask);
                         if (canJump && hit.gameObject == targetPlat)
                             goto MoveOn;
@@ -131,32 +132,13 @@ namespace Catformer
                         {
                             if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
                             {
-                                //hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.green;
                                 targetMove = hit.transform.GetChild(0).position;
                                 targetPlat = hit.gameObject;
-                                //transform.position = targetMove;
-                                //speed = hit.gameObject.GetComponent<Platform>().speed;
-                                //hit = hitPlatform;
                                 jumpAudio.Play();
                                 catAnimator.SetBool("isJumping", true);
 
-                                /*if (hit.gameObject.GetComponent<Platform>().transform.position.x < 0.0f)
-                                {
-                                    mRenderer.flipX = true;
-                                    //Debug.Log("should flip");
-                                }
-                                else if (hit.gameObject.GetComponent<Platform>().transform.position.x > -0.0f)
-                                {
-                                    mRenderer.flipX = false;
-                                    //Debug.Log("should flip");
-                                }*/
-
                                 canJump = false;
                             }
-                            /*else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
-                            {
-                                hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.black;
-                            }*/
                         }
                     }
                 }
@@ -170,18 +152,11 @@ namespace Catformer
                     {
                         if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
                         {
-                            //hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.green;
                             targetMove = hit.transform.GetChild(0).position;
                             targetPlat = hit.gameObject;
-                            //transform.position = targetMove;
                             jumpAudio.Play();
                             catAnimator.SetBool("isJumping", true);
-                            //speed = hit.gameObject.GetComponent<Platform>().speed;
                         }
-                        /*else if (hit.collider.gameObject.GetComponent<SpriteRenderer>().color != Color.white)
-                        {
-                            hit.collider.gameObject.GetComponent<SpriteRenderer>().material.color = Color.black;
-                        }*/
 
                         canJump = false;
                     }
@@ -201,12 +176,10 @@ namespace Catformer
                 if (targetMove.x < 0.0f)
                 {
                     mRenderer.flipX = true;
-                    Debug.Log("should flip");
                 }
                 if (targetMove.x >= 0.0f)
                 {
                     mRenderer.flipX = false;
-                    Debug.Log("should flip");
                 }
 
                 canJump = true;
