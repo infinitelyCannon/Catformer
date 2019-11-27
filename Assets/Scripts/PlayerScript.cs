@@ -101,6 +101,11 @@ namespace Catformer
         {
             score += transform.position.y - lastPosition.y;
             lastPosition = transform.position;
+
+            // Checks the distance to the target platform and lets them jump if close enough.
+            if (Vector3.Distance(transform.position, targetMove) <= 0.01f)
+                CheckJump();
+
             if (!isDead && Time.timeScale > 0)
             {
                 if (targetPlat != null && targetPlat.transform.childCount > 1)
@@ -111,7 +116,10 @@ namespace Catformer
                     canJump = false;
                 }
                 else
+                {
                     transform.position = Vector3.MoveTowards(transform.position, targetMove, speed * Time.deltaTime);
+                }
+                    
 
                 if (transform.parent != null)
                 {
@@ -166,6 +174,25 @@ namespace Catformer
                 scoreText.text = "Elevation: " + string.Format("{0:n2}", score) + "ft";
             }
         }
+
+        //This function resets canJump and sprites.
+        private void CheckJump()
+        {
+            catAnimator.SetBool("isJumping", false);
+            mRenderer.flipX = (targetMove.x < 0.0f);
+
+            if (targetMove.x < 0.0f)
+            {
+                mRenderer.flipX = true;
+            }
+            if (targetMove.x >= 0.0f)
+            {
+                mRenderer.flipX = false;
+            }
+
+            canJump = true;
+        }
+
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.gameObject == targetPlat)

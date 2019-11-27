@@ -11,6 +11,13 @@ public class PlatformGenerator : MonoBehaviour
         Camera
     }
 
+    public enum Place
+    {
+        Forest,
+        Sky,
+        Space
+    };
+
     public GameObject[] templates;
     public int spawnRate;
     public Transform[] spawnPoints;
@@ -92,16 +99,6 @@ public class PlatformGenerator : MonoBehaviour
                     SpawnClouds(topEdge.y);
                 else
                     SpawnPlatforms(topEdge.y);
-                //SpawnHazard(topEdge.y);
-                /*spawnVector = new Vector3(
-                        spawnPoints[Random.Range(0, spawnPoints.Length)].position.x Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f)),
-                        Random.Range(topEdge.y + (PLATFORM_HEIGHT / 2f), (topEdge.y + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f);
-
-                if (platformInstance == null || spawnVector.y - platformInstance.transform.position.y> spawnDist) //Matt
-                {
-                    platformInstance = Instantiate(templates[0], spawnVector, Quaternion.identity) as GameObject;
-                }*/
             }
         }
         // Or on touch . . .
@@ -127,44 +124,95 @@ public class PlatformGenerator : MonoBehaviour
                     SpawnClouds(topEdge.y);
                 else
                     SpawnPlatforms(topEdge.y);
-                //SpawnHazard(topEdge.y);
             }
         }
+    }
+
+    float FindSecondSide(Vector3 size1, Vector3 size2, float xSpot)
+    {
+        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
+
+        if(xSpot > 0)
+        {
+            return Random.Range(leftEdge.x + (size2.x / 2f), xSpot - (size1.x / 2f));
+        }
+        else
+        {
+            return Random.Range(xSpot + (size1.x / 2f), rightEdge.x - (size2.x / 2f));
+        }
+    }
+
+    private bool DoesOverlap(Vector3 location, Vector3 size)
+    {
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(location, size, 0f, LayerMask.GetMask("Platforms"));
+
+        if (colliders.Length > 0)
+            return true;
+
+        return false;
     }
 
     void SpawnPlatforms(float topEdgeY)
     {
         int spot = Random.Range(1, 4);
+        float camWidth = Vector3.Distance(
+            mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f)),
+            mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f))
+            );
+        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
 
-        if(spot == 1)
+
+        if (spot == 1)
         {
+            int selection = Random.Range(0, templates.Length);
+            Vector3 size = templates[selection].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection].transform.localScale.x;
+            float xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+
             spawnVector = new Vector3(
-                        spawnPoints[0].position.x /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        xSpot,
                         Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
                         0f);
-            Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
+            if(!DoesOverlap(spawnVector, size))
+                Instantiate(templates[selection], spawnVector, Quaternion.identity);
         }
         else if (spot == 2)
         {
+            int selection = Random.Range(0, templates.Length);
+            Vector3 size = templates[selection].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection].transform.localScale.x;
+            float xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+
             spawnVector = new Vector3(
-                        spawnPoints[1].position.x /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        xSpot,
                         Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
                         0f);
-            Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
+            if(!DoesOverlap(spawnVector, size))
+                Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
         }
         else // spot == 3
         {
-            spawnVector = new Vector3(
-                        spawnPoints[0].position.x /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
-                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f);
-            Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
+            int selection1 = Random.Range(0, templates.Length);
+            Vector3 size = templates[selection1].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection1].transform.localScale.x;
+            float xSpot1 = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+
+            int selection2 = Random.Range(0, templates.Length);
+            Vector3 size2 = templates[selection2].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection2].transform.localScale.x;
+            float xSpot2 = FindSecondSide(size, size2, xSpot1);
 
             spawnVector = new Vector3(
-                        spawnPoints[1].position.x /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        xSpot1,
                         Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
                         0f);
-            Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
+            if(!DoesOverlap(spawnVector, size))
+                Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
+
+            spawnVector = new Vector3(
+                        xSpot2,
+                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f);
+            if(!DoesOverlap(spawnVector, size2))
+                Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
         }
     }
 
@@ -173,7 +221,7 @@ public class PlatformGenerator : MonoBehaviour
         for (int i = 0; i < spawnPoints.Length; i++)
         {
             spawnVector = new Vector3(
-                        Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f) /*Random.Range(leftEdge.x + (PLATFORM_WIDTH / 2f), rightEdge.x - (PLATFORM_WIDTH / 2f))*/,
+                        Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f),
                         Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
                         0f);
 

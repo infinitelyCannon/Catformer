@@ -30,7 +30,7 @@ public class TimeManager : MonoBehaviour
         }
         else if (Time.timeScale > 0)
         {
-            background.color = new Color(1, 1, 1, 0.55f);
+            background.color = new Color(1, 1, 1, 0.8f);
             for (int j = 0; j < transform.childCount; j++)
                 transform.GetChild(j).gameObject.SetActive(true);
             Time.timeScale = 0f;

@@ -28,8 +28,11 @@ public class MenuNavScript : MonoBehaviour
     public void ToMenu()
     {
         Time.timeScale = 1f;
+        if (Catformer.SavedPreferences.instance != null)
         Destroy(Catformer.SavedPreferences.instance.gameObject);
+        
         SceneManager.LoadScene(0);
+
         /*
         musicAudio.Stop();
         musicAudio.clip = gameMusic;

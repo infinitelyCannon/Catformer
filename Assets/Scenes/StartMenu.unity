@@ -2912,6 +2912,8 @@ MonoBehaviour:
   - Character7
   - Character8
   - Character9
+  - Character10
+  - Character11
   characterY: 
   characterAnimation: 0
   characterList:
@@ -2924,6 +2926,8 @@ MonoBehaviour:
   - {fileID: -6367681951554976319, guid: d4e27ce40ff764f91be4a0efc56f18d5, type: 3}
   - {fileID: -6367681951554976319, guid: b92088320aeaf4e95919426e484e9029, type: 3}
   - {fileID: -6367681951554976319, guid: ea3b144e20a844883b8221c43d92e5c7, type: 3}
+  - {fileID: -3712061620514355849, guid: a7d60fe970128413295c01f0fa8cd3da, type: 3}
+  - {fileID: -6367681951554976319, guid: a2a6b0dd1c0784f9086dc0f48c06ed09, type: 3}
   startMenu: {fileID: 1171691138}
   characterCat: {fileID: 1272339630}
   customizeCat: {fileID: 1440656655}
