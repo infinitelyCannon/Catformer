@@ -272,6 +272,7 @@ GameObject:
   - component: {fileID: 382301349}
   - component: {fileID: 382301350}
   - component: {fileID: 382301351}
+  - component: {fileID: 382301352}
   m_Layer: 0
   m_Name: CatDude
   m_TagString: Player
@@ -298,6 +299,7 @@ MonoBehaviour:
   hitPlatform: {fileID: 0}
   jumpAudio: {fileID: 382301349}
   hurtAudio: {fileID: 382301350}
+  meowAudio: {fileID: 382301352}
   catAnimator: {fileID: 382301351}
   canJump: 0
   pointsPerPlatform: 0
@@ -305,6 +307,7 @@ MonoBehaviour:
   touchRadius: 0.2
   deathScreen: {fileID: 0}
   scoreText: {fileID: 0}
+  soundDelay: 0.5
 --- !u!61 &382301345
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -387,7 +390,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 382301343}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.7, y: -8.14, z: 0}
+  m_LocalPosition: {x: 3.82, y: -8.14, z: 0}
   m_LocalScale: {x: 1.634, y: 1.699, z: 1}
   m_Children:
   - {fileID: 1092440095}
@@ -629,6 +632,102 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!82 &382301352
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382301343}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: ee5feaf90010dc64f814e8ef1de64ac1, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -863,16 +962,20 @@ MonoBehaviour:
   - {fileID: 671280974662003864, guid: 0e8ffc358a7e7ad42bae3e1cdc169895, type: 3}
   - {fileID: 1706668597832959353, guid: 966aaff01a03db046abbafd6082d1839, type: 3}
   - {fileID: 3031601399664329987, guid: 6a6537f9796a72c488f0778e66f24f59, type: 3}
-  spawnRate: 0
+  spawnRate: 0.3
   spawnPoints:
   - {fileID: 55013829}
   - {fileID: 1453035285}
   templatesCloud:
   - {fileID: 1612026175244242381, guid: 9de9bee7fc1038a4eac4324a5a32d357, type: 3}
-  - {fileID: 8525801819283692795, guid: bcc07553f7d9cfb4cbf58ae530e74abd, type: 3}
   - {fileID: 855352844471018051, guid: ebbb8ffe249a8a0469b96e07d35ce5a1, type: 3}
-  cloudHeight: 180
-  spaceHeight: 0
+  - {fileID: 4887394871237122788, guid: ea27654041534974e96ae6cb3b7c847f, type: 3}
+  meteorPrefabs:
+  - {fileID: 403630370029470438, guid: dbc26a4640dc36843b36e20864bba460, type: 3}
+  - {fileID: 89222855114777276, guid: 2bbe77e34ffb3004da33b8b7831a40c6, type: 3}
+  - {fileID: 1622502511546128924, guid: 13c5a2e33ab1c5141a68c46dfa770742, type: 3}
+  cloudHeight: 170
+  spaceHeight: 350
   SafetyZoneColor: {r: 0, g: 1, b: 1, a: 1}
   spawnDist: 3
   hazardPrefabs:
@@ -966,7 +1069,7 @@ PrefabInstance:
     - target: {fileID: 1164085971475083214, guid: ef43d5b66d359184c96719cc0a9c2022,
         type: 3}
       propertyPath: speed
-      value: 40
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ef43d5b66d359184c96719cc0a9c2022, type: 3}
@@ -1061,7 +1164,7 @@ GameObject:
   - component: {fileID: 1092440096}
   m_Layer: 0
   m_Name: HazardSpawner
-  m_TagString: Untagged
+  m_TagString: PPHazard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1095,6 +1198,7 @@ MonoBehaviour:
   Hazards:
   - {fileID: 2920126643326862133, guid: fb9556603d9308d449c216b2ce14ac64, type: 3}
   - {fileID: 4400159642858540715, guid: d577f1390ccca0c48837a6660796cd35, type: 3}
+  - {fileID: 996705497106461868, guid: 02d5ec074330d5a4aa27b906a99cec58, type: 3}
   spawnerPosition: {x: 0, y: 0, z: 0}
   player: {fileID: 382301343}
   hazardWarningLeft: {fileID: 1326220106}
@@ -1102,6 +1206,7 @@ MonoBehaviour:
   selectHazard: 0
   timeLeft: 5
   planeSpawnNow: 270
+  meteorSpawnNow: 350
 --- !u!1 &1326220106 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4534799279237491391, guid: 31fbc5deede4332408a682bef5416aa2,
@@ -1701,6 +1806,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2449425008401947353, guid: 0e8ffc358a7e7ad42bae3e1cdc169895,
+        type: 3}
+      propertyPath: fallSpeed
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e8ffc358a7e7ad42bae3e1cdc169895, type: 3}

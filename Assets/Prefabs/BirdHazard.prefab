@@ -128,7 +128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   caughtSpace: {fileID: 2920126642465524341}
-  birdSound: {fileID: 2920126643326862139}
+  mSound: {fileID: 2920126643326862139}
 --- !u!61 &2920126643326862137
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -142,7 +142,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.18, y: -0.44}
+  m_Offset: {x: 0.18, y: -0.63}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -153,7 +153,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.91, y: 1.28}
+  m_Size: {x: 1.21, y: 0.87}
   m_EdgeRadius: 0
 --- !u!50 &2920126643326862136
 Rigidbody2D:

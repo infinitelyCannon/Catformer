@@ -99,7 +99,10 @@ MonoBehaviour:
   speed: 7
   isGood: 1
   timeLeft: 3
+  shouldFade: 1
   playerPresent: 0
+  leafBoundary: {x: 0, y: 0, z: 0}
+  boundaryColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!61 &3368257446119663240
 BoxCollider2D:
   m_ObjectHideFlags: 0

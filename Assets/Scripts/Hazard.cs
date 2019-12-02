@@ -6,7 +6,7 @@ public class Hazard : MonoBehaviour
 {
     public float speed;
     public GameObject caughtSpace;
-    public AudioSource birdSound;
+    public AudioSource mSound;
 
     private Camera mCamera;
 
@@ -35,6 +35,12 @@ public class Hazard : MonoBehaviour
             transform.Translate(speed * Time.deltaTime, -1 * Time.deltaTime, 0);
             Destroy(gameObject, 5);
         }
+        if (gameObject.tag == "MeteorHazard")
+        {
+            transform.Translate(speed * Time.deltaTime, -1 * Time.deltaTime, 0);
+            gameObject.transform.Rotate(0, 0, -30);
+            Destroy(gameObject, 5);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -43,7 +49,12 @@ public class Hazard : MonoBehaviour
         {
             Debug.Log("HitPlayer");
             collision.transform.parent = caughtSpace.transform;
-            birdSound.Play();
+            collision.gameObject.GetComponent<Catformer.PlayerScript>().isDead = true;
+            mSound.Play();
+
+            GameObject catdude = collision.gameObject;
+           // catdude.transform.Rotate(0, 0, -60);
+            
         }
     }
 

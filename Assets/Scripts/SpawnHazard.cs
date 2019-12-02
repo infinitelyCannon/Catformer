@@ -16,6 +16,8 @@ public class SpawnHazard : MonoBehaviour
     public int selectHazard;
     public float timeLeft = 5;
     public float planeSpawnNow;
+    public float meteorSpawnNow;
+    private Quaternion hazardRotation;
     float initialTimeLeft;
     void Start()
     {
@@ -51,14 +53,28 @@ public class SpawnHazard : MonoBehaviour
 
         if (timeLeft <= 0 && side == "left")
         {
-
-            Instantiate(Hazards[selectHazard], spawnerPosition + new Vector3(0, Random.Range(0, 10), 0), Quaternion.identity);
+            if (selectHazard == 2)
+            {
+                Instantiate(Hazards[selectHazard], spawnerPosition + new Vector3(0, Random.Range(0, 10), 0), Quaternion.Euler(0, 0, -10));
+            }
+            else
+            {
+                Instantiate(Hazards[selectHazard], spawnerPosition + new Vector3(0, Random.Range(0, 10), 0), Quaternion.identity);
+            }
             timeLeft = initialTimeLeft;
             side = spawnSide[Random.Range(0, spawnSide.Length)];
         }
         else if (timeLeft <= 0 && side == "right")
         {
-            GameObject spawnRight = Instantiate(Hazards[selectHazard],spawnerPosition + new Vector3 (-spawnerPosition.x * 2,Random.Range(0,10),0), Quaternion.identity);
+            if (selectHazard == 2)
+            {
+                hazardRotation = Quaternion.Euler(0, 0, 10);
+            }
+            else
+            {
+                hazardRotation = Quaternion.identity;
+            }
+            GameObject spawnRight = Instantiate(Hazards[selectHazard],spawnerPosition + new Vector3 (-spawnerPosition.x * 2,Random.Range(0,10),0), hazardRotation);
             spawnRight.GetComponent<Hazard>().speed *= -1;
             spawnRight.GetComponent<SpriteRenderer>().flipX = false;
             timeLeft = initialTimeLeft;
@@ -67,10 +83,15 @@ public class SpawnHazard : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (spawnerPosition.y >= planeSpawnNow)
+            if (spawnerPosition.y >= planeSpawnNow && spawnerPosition.y <= meteorSpawnNow)
             {
                 selectHazard = 1;
                 initialTimeLeft = 3;
+            }
+            else if (spawnerPosition.y >= meteorSpawnNow)
+            {
+                selectHazard = 2;
+                initialTimeLeft = 2.5f;
             }
         }
         if (Input.touchCount > 0)
@@ -79,11 +100,16 @@ public class SpawnHazard : MonoBehaviour
 
             if (touch.phase == TouchPhase.Began)
             {
-                if (spawnerPosition.y >= planeSpawnNow)
+                if (spawnerPosition.y >= planeSpawnNow && spawnerPosition.y <= meteorSpawnNow)
                 {
                     selectHazard = 1;
                     initialTimeLeft = 3;
                 }
+            }
+            else if (spawnerPosition.y >= meteorSpawnNow)
+            {
+                selectHazard = 2;
+                initialTimeLeft = 2.5f;
             }
         }
 

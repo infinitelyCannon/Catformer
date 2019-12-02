@@ -78,7 +78,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 17.17, y: 8.29}
+  m_Size: {x: 5.34, y: 5.43}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -96,10 +96,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c6f56cb2c00854d90f2e7465917ad1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 7
+  speed: 2
   isGood: 1
-  timeLeft: 3
+  timeLeft: -1
   playerPresent: 0
+  leafBoundary: {x: 0, y: 0, z: 0}
+  boundaryColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!61 &7843602011050269528
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -118,7 +120,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 5.34, y: 5.43}
-    newSize: {x: 17.17, y: 8.29}
+    newSize: {x: 5.34, y: 5.43}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0

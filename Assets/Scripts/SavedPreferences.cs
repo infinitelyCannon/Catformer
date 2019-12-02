@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 
         private bool hints;
 
+        public Text catText;
         public GameObject[] hintImages;
         public string[] characterX;
         public string characterY;
@@ -62,6 +63,60 @@ using UnityEngine.SceneManagement;
         void Update()
         {
             musicAudio.volume = musicVolume;
+            switch (currentCharacter)
+            {
+                case 0:
+                    catText.text = "Cat Dude";
+                    break;
+                case 1:
+                    catText.text = "Tiger";
+                    break;
+                case 2:
+                    catText.text = "Bluey";
+                    break;
+                case 3:
+                    catText.text = "Cocoa";
+                    break;
+                case 4:
+                    catText.text = "DakaraiCat";
+                    break;
+                case 5:
+                    catText.text = "Simon";
+                    break;
+                case 6:
+                    catText.text = "KyleCat";
+                    break;
+                case 7:
+                    catText.text = "MateoCat";
+                    break;
+                case 8:
+                    catText.text = "CottonCatty";
+                    break;
+                case 9:
+                    catText.text = "VolcaniCat";
+                    break;
+                case 10:
+                    catText.text = "AstroCat";
+                    break;
+                case 11:
+                    catText.text = "WatersCat";
+                    break;
+                case 12:
+                    catText.text = "Frenchy";
+                    break;
+                case 13:
+                    catText.text = "NoraCat";
+                    break;
+                case 14:
+                    catText.text = "TacoCat";
+                    break;
+                case 15:
+                    catText.text = "Trippy";
+                    break;
+                case 16:
+                    catText.text = "Catsper";
+                    break;
+            }
         }
         public void StartGame()
         {

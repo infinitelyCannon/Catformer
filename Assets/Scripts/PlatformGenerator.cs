@@ -19,9 +19,10 @@ public class PlatformGenerator : MonoBehaviour
     };
 
     public GameObject[] templates;
-    public int spawnRate;
+    public float spawnRate;
     public Transform[] spawnPoints;
     public GameObject[] templatesCloud;
+    public GameObject[] meteorPrefabs;
 
     public float cloudHeight;
     public float spaceHeight;
@@ -49,6 +50,7 @@ public class PlatformGenerator : MonoBehaviour
     private GameObject hazardInstance;
 
     private float elevation = 0f;
+    private float mTime = 0;
 
     private void Awake()
     {
@@ -67,6 +69,7 @@ public class PlatformGenerator : MonoBehaviour
     {
         // The target the player will move to.
         GameObject startPoint;
+        elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
 
         // The position of the green line the camera uses to follow the player
         Vector3 followLine = mCamera.ViewportToWorldPoint(new Vector3(0.5f, mCamera.gameObject.GetComponent<CameraController>().followLine, 10f));
@@ -75,6 +78,16 @@ public class PlatformGenerator : MonoBehaviour
         Vector3 topEdge = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10f));
         Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
         Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+
+        if(elevation <= cloudHeight && Time.timeScale > 0)
+        {
+            mTime += Time.deltaTime;
+            if(mTime >= spawnRate)
+            {
+                SpawnPlatforms(topEdge.y);
+                mTime -= mTime;
+            }
+        }
 
         // On click . . .
         if (Time.timeScale > 0 && Input.GetMouseButtonDown(0))
@@ -95,10 +108,10 @@ public class PlatformGenerator : MonoBehaviour
                 SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
                 //Holds random spawn vector
                 elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
-                if (elevation >= cloudHeight)
+                if (elevation >= cloudHeight && elevation <= spaceHeight)
                     SpawnClouds(topEdge.y);
-                else
-                    SpawnPlatforms(topEdge.y);
+                else if (elevation >= spaceHeight)
+                    SpawnMeteors(topEdge.y);
             }
         }
         // Or on touch . . .
@@ -120,10 +133,10 @@ public class PlatformGenerator : MonoBehaviour
                 SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
                 //Finds elevation to reference transitions
                 elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
-                if (elevation > cloudHeight)
+                if (elevation > cloudHeight && elevation <= spaceHeight)
                     SpawnClouds(topEdge.y);
-                else
-                    SpawnPlatforms(topEdge.y);
+                else if (elevation >= spaceHeight)
+                    SpawnMeteors(topEdge.y);
             }
         }
     }
@@ -151,6 +164,34 @@ public class PlatformGenerator : MonoBehaviour
             return true;
 
         return false;
+    }
+
+    void SpawnMeteors(float topEdgeY)
+    {
+        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
+        float xSpot;
+
+        for (int i = 0; i < spawnPoints.Length; i++)
+        {
+            int selection = Random.Range(0, meteorPrefabs.Length);
+
+            Vector3 size = meteorPrefabs[selection].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection].transform.localScale.x;
+            xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+
+            spawnVector = new Vector3(
+                        xSpot,//Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f),
+                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+                        0f);
+
+            if(!DoesOverlap(spawnVector, size))
+            {
+                if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
+                {
+                    platformInstances[i] = Instantiate(meteorPrefabs[selection], spawnVector, Quaternion.identity) as GameObject;
+                }
+            }
+        }
     }
 
     void SpawnPlatforms(float topEdgeY)
@@ -218,16 +259,28 @@ public class PlatformGenerator : MonoBehaviour
 
     void SpawnClouds(float topEdgeY)
     {
+        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
+        float xSpot;
+
         for (int i = 0; i < spawnPoints.Length; i++)
         {
+            int selection = Random.Range(0, templatesCloud.Length);
+
+            Vector3 size = templatesCloud[selection].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection].transform.localScale.x;
+            xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+
             spawnVector = new Vector3(
-                        Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f),
+                        xSpot,//Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f),
                         Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
                         0f);
 
-            if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
+            if (!DoesOverlap(spawnVector, size))
             {
-                platformInstances[i] = Instantiate(templatesCloud[Random.Range(0, templatesCloud.Length)], spawnVector, Quaternion.identity) as GameObject;
+                if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
+                {
+                    platformInstances[i] = Instantiate(templatesCloud[selection], spawnVector, Quaternion.identity) as GameObject;
+                }
             }
         }
     }

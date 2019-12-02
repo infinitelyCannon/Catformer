@@ -292,6 +292,7 @@ MonoBehaviour:
   hitPlatform: {fileID: 0}
   jumpAudio: {fileID: 382301349}
   hurtAudio: {fileID: 382301350}
+  meowAudio: {fileID: 0}
   catAnimator: {fileID: 382301351}
   canJump: 0
   pointsPerPlatform: 0
@@ -299,6 +300,7 @@ MonoBehaviour:
   touchRadius: 0.2
   deathScreen: {fileID: 0}
   scoreText: {fileID: 0}
+  soundDelay: 0.5
 --- !u!61 &382301345
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -772,7 +774,7 @@ MonoBehaviour:
   - {fileID: 671280974662003864, guid: 0e8ffc358a7e7ad42bae3e1cdc169895, type: 3}
   - {fileID: 1706668597832959353, guid: 966aaff01a03db046abbafd6082d1839, type: 3}
   - {fileID: 3031601399664329987, guid: 6a6537f9796a72c488f0778e66f24f59, type: 3}
-  spawnRate: 0
+  spawnRate: 0.3
   spawnPoints:
   - {fileID: 55013829}
   - {fileID: 1453035285}
@@ -780,8 +782,12 @@ MonoBehaviour:
   - {fileID: 1612026175244242381, guid: 9de9bee7fc1038a4eac4324a5a32d357, type: 3}
   - {fileID: 8525801819283692795, guid: bcc07553f7d9cfb4cbf58ae530e74abd, type: 3}
   - {fileID: 855352844471018051, guid: ebbb8ffe249a8a0469b96e07d35ce5a1, type: 3}
+  meteorPrefabs:
+  - {fileID: 403630370029470438, guid: dbc26a4640dc36843b36e20864bba460, type: 3}
+  - {fileID: 89222855114777276, guid: 2bbe77e34ffb3004da33b8b7831a40c6, type: 3}
+  - {fileID: 1622502511546128924, guid: 13c5a2e33ab1c5141a68c46dfa770742, type: 3}
   cloudHeight: 170
-  spaceHeight: 0
+  spaceHeight: 350
   SafetyZoneColor: {r: 0, g: 1, b: 1, a: 1}
   spawnDist: 3
   hazardPrefabs:
@@ -882,6 +888,11 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 197221621195649858, guid: 6a6537f9796a72c488f0778e66f24f59,
+        type: 3}
+      propertyPath: speed
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6a6537f9796a72c488f0778e66f24f59, type: 3}
 --- !u!1 &1092440094
@@ -930,6 +941,7 @@ MonoBehaviour:
   Hazards:
   - {fileID: 2920126643326862133, guid: fb9556603d9308d449c216b2ce14ac64, type: 3}
   - {fileID: 4400159642858540715, guid: d577f1390ccca0c48837a6660796cd35, type: 3}
+  - {fileID: 996705497106461868, guid: 02d5ec074330d5a4aa27b906a99cec58, type: 3}
   spawnerPosition: {x: 0, y: 0, z: 0}
   player: {fileID: 382301343}
   hazardWarningLeft: {fileID: 1326220106}
@@ -937,6 +949,7 @@ MonoBehaviour:
   selectHazard: 0
   timeLeft: 5
   planeSpawnNow: 270
+  meteorSpawnNow: 350
 --- !u!1 &1326220106 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4534799279237491391, guid: 31fbc5deede4332408a682bef5416aa2,
@@ -1212,6 +1225,11 @@ PrefabInstance:
     - target: {fileID: 1706668597832959359, guid: 966aaff01a03db046abbafd6082d1839,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4540063144031073080, guid: 966aaff01a03db046abbafd6082d1839,
+        type: 3}
+      propertyPath: speed
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1705,6 +1723,11 @@ PrefabInstance:
     - target: {fileID: 671280974662003870, guid: 0e8ffc358a7e7ad42bae3e1cdc169895,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2449425008401947353, guid: 0e8ffc358a7e7ad42bae3e1cdc169895,
+        type: 3}
+      propertyPath: speed
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

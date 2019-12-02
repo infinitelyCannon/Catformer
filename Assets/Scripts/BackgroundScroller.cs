@@ -82,51 +82,24 @@ public class BackgroundScroller : MonoBehaviour
                 renderer.sprite = backgroundStages[stageIndex].sprite;
             }
             else
+            {
+                renderer.sprite = backgroundStages[stageIndex].sprite;
                 backgroundStages[stageIndex].times -= 1;
+            }
         }
         else
         {
             renderer.sprite = backgroundStages[stageIndex].sprite;
+        }
+        if (renderer.sprite.name.Contains("space"))
+        {
+            renderer.gameObject.GetComponentInChildren<ParticleSystem>().Play();
         }
     }
 
     public Stage GetStage()
     {
         return stage;
-    }
-
-    private float LoopFloat(float value, float min, float max)
-    {
-        if (value <= max && value >= min)
-            return value;
-
-        float distance = max - min;
-
-        if(value >= 0)
-        {
-            while (value > distance)
-                value -= distance;
-        }
-        else
-        {
-            while (Mathf.Abs(value) > distance)
-                value += distance;
-        }
-
-        if (value < min)
-            return max - Mathf.Abs(min - value);
-            
-        if (value > max)
-            return min + Mathf.Abs(max - value);
-
-        return value;
-    }
-    private void OnGUI()
-    {
-        //GUIStyle style = new GUIStyle(GUI.skin.GetStyle("Label"));
-        //style.fontSize = 62;
-        //GUI.Label(new Rect(500, 500, 700, 500), mTime.ToString(), style);
-        //GUI.Label(new Rect(500, 700, 700, 500), newSpot.ToString(), style);
     }
 
     void Resize()

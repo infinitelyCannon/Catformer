@@ -19,6 +19,7 @@ public class CameraController : MonoBehaviour
     private Vector3 followTarget;
     private Vector3 lastTargetPosition;
     private Vector3 currentVelocity;
+    private float lastPlayerPosition;
 
     private const float Z_POS = 10f;
 
@@ -26,6 +27,7 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         playerRef = GameObject.FindGameObjectWithTag("Player").transform;
+        lastPlayerPosition = playerRef.position.y;
         followTarget = GetComponent<Camera>().ViewportToWorldPoint(new Vector3(0.5f, followLine, Z_POS));
     }
 
@@ -33,11 +35,13 @@ public class CameraController : MonoBehaviour
     {
         followTarget = GetComponent<Camera>().ViewportToWorldPoint(new Vector3(0.5f, followLine, Z_POS));
 
-        if (playerRef.position.y >= followTarget.y)
+        if (!playerRef.gameObject.GetComponent<Catformer.PlayerScript>().isDead && playerRef.position.y >= followTarget.y && (playerRef.position.y - lastPlayerPosition) >= 0)
         {
             Vector3 newPos = Vector3.SmoothDamp(new Vector3(0f, transform.position.y, -Z_POS), new Vector3(0f, playerRef.position.y, -Z_POS), ref currentVelocity, damping);
             transform.position = newPos;
         }
+
+        lastPlayerPosition = playerRef.position.y;
     }
 
     private void OnDrawGizmosSelected()

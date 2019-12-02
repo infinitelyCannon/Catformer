@@ -16,6 +16,7 @@ namespace Catformer
         public Collider2D hitPlatform;
         public AudioSource jumpAudio;
         public AudioSource hurtAudio;
+        public AudioSource meowAudio;
         public Animator catAnimator;
         public bool canJump;
         public int pointsPerPlatform;
@@ -33,10 +34,12 @@ namespace Catformer
 
         public GameObject deathScreen;
         public Text scoreText;
+        public float soundDelay = 0.5f;
 
         // Start is called before the first frame update
         void Start()
         {
+            
             targetPlat = gameObject;
             cameraRef = Camera.main;
             mRenderer = GetComponent<SpriteRenderer>();
@@ -85,8 +88,10 @@ namespace Catformer
 
             isDead = true;
             hurtAudio.Play();
+            //Meow audio delay
+            StartCoroutine(DeathAudio(soundDelay));
             deathScreen.SetActive(true);
-            deathText.text = "Game Over\nฅ(＾x ω x＾ฅ)∫\nElevation: " + string.Format("{0:n2}", score) + "ft" + "\nTotal Time: " + secs.ToString(@"hh\:mm\:ss\:fff");
+            deathText.text = "Score: " + string.Format("{0:n2}ft", score);
         }
 
         private void OnGUI()
@@ -152,12 +157,13 @@ namespace Catformer
                 }
                 else if (Input.GetMouseButtonDown(0))
                 {
-
+                    
                     Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(Input.mousePosition), touchRadius, platformMask);
                     if (canJump && hit != null && hit.gameObject == targetPlat)
                         goto MoveOn;
                     if (hit != null && canJump == true)
                     {
+                        
                         if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
                         {
                             targetMove = hit.transform.GetChild(0).position;
@@ -171,7 +177,7 @@ namespace Catformer
                 }
             MoveOn:
                 playTime += Time.deltaTime;
-                scoreText.text = "Elevation: " + string.Format("{0:n2}", score) + "ft";
+                scoreText.text = "" + string.Format("{0:n2}", score) + "ft";
             }
         }
 
@@ -237,6 +243,13 @@ namespace Catformer
                 return result;
 
             return result.Remove(dot + decimalPlaces + 1);//5.555
+        }
+
+        IEnumerator DeathAudio(float delay)
+        {
+            //meowAudio.Play();
+            yield return new WaitForSeconds(delay);
+            meowAudio.Play();
         }
     }
 }

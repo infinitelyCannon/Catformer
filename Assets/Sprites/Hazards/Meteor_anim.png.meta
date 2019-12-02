@@ -14,6 +14,15 @@ TextureImporter:
   - first:
       213: -6744407381781148267
     second: Meteor_3
+  - first:
+      213: 8895759975929239495
+    second: Meteor_anim_0
+  - first:
+      213: -6819929653948491871
+    second: Meteor_anim_1
+  - first:
+      213: 1260337525754191362
+    second: Meteor_anim_3
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -118,13 +127,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Meteor_1
+      name: Meteor_anim_0
       rect:
         serializedVersion: 2
-        x: 29
-        y: 56
-        width: 454
-        height: 920
+        x: 56
+        y: 1053
+        width: 920
+        height: 454
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -132,20 +141,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5f9e2815f81a24d63b29435a23e3d341
-      internalID: -2967113423327029113
+      spriteID: a906a9d2b7547e64ca699085e703ac09
+      internalID: 8895759975929239495
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Meteor_2
+      name: Meteor_anim_1
       rect:
         serializedVersion: 2
-        x: 532
-        y: 56
-        width: 473
-        height: 872
+        x: 56
+        y: 531
+        width: 871
+        height: 473
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,8 +162,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b143f7f33926b4a10964b3303b2bb28b
-      internalID: 2182055113893026377
+      spriteID: 7c22fa9cfe2dd0544ba276c961b09dc1
+      internalID: -6819929653948491871
       vertices: []
       indices: 
       edges: []
@@ -163,10 +172,10 @@ TextureImporter:
       name: Meteor_anim_2
       rect:
         serializedVersion: 2
-        x: 804
-        y: 890
-        width: 27
-        height: 86
+        x: 891
+        y: 705
+        width: 84
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,20 +183,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4feb0835c16674c8e882e698117b3dc0
+      spriteID: fc7d0aa13c0466847a8f94b26c172de0
       internalID: -6807827746993933211
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Meteor_3
+      name: Meteor_anim_3
       rect:
         serializedVersion: 2
-        x: 1054
-        y: 49
-        width: 453
-        height: 809
+        x: 49
+        y: 29
+        width: 809
+        height: 453
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -195,8 +204,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d93c66f9520fb4c489b6292885c6d8ce
-      internalID: -6744407381781148267
+      spriteID: 5791c71a829a33f46b50d5cc00f3bc1c
+      internalID: 1260337525754191362
       vertices: []
       indices: 
       edges: []

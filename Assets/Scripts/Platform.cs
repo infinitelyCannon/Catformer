@@ -7,8 +7,14 @@ public class Platform : MonoBehaviour
     public float speed;
     public bool isGood;
     public float timeLeft = 3;
+    public bool shouldFade;
     float InitialTimeLeft;
     public bool playerPresent;
+
+    [Header("Leaf Variables Only")]
+    public Vector3 leafBoundary;
+    public Color boundaryColor = Color.yellow;
+
     SpriteRenderer platformRenderer;
     private float alpha = 1.0f;
     ParticleSystem particles;
@@ -17,6 +23,7 @@ public class Platform : MonoBehaviour
     private Camera mCamera;
     float camHeight;
     private Vector3 bottomEdge;
+    private bool isLeaf;
 
     // Start is called before the first frame update
     void Start()
@@ -43,14 +50,17 @@ public class Platform : MonoBehaviour
             timeLeft = 1f;
             InitialTimeLeft = 1f;
         }
+
+        isLeaf = platformRenderer.sprite.name.Contains("Leaf");
     }
 
     // Update is called once per frame
    void Update()
     {
-        //transform.position += new Vector3(0, -1, 0) * speed * Time.deltaTime;
+        if(isLeaf)
+            transform.position += new Vector3(0, -1, 0) * speed * Time.deltaTime;
 
-        if (playerPresent == true)
+        if (playerPresent == true && shouldFade)
         {
             timeLeft -= Time.deltaTime;
             alpha = ((timeLeft / InitialTimeLeft)) * (1f) / (InitialTimeLeft - timeLeft);
