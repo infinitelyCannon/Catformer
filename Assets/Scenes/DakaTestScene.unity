@@ -305,6 +305,7 @@ MonoBehaviour:
   pointsPerPlatform: 0
   isDead: 0
   touchRadius: 0.2
+  anchor: {fileID: 0}
   deathScreen: {fileID: 0}
   scoreText: {fileID: 0}
   soundDelay: 0.5
@@ -916,11 +917,6 @@ PrefabInstance:
       propertyPath: secondBackground
       value: 
       objectReference: {fileID: 794915123}
-    - target: {fileID: 7218142102244335516, guid: dc0a16f3846241047aaeefb2912f556a,
-        type: 3}
-      propertyPath: speed
-      value: 20
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc0a16f3846241047aaeefb2912f556a, type: 3}
 --- !u!1 &794915123 stripped
@@ -970,12 +966,17 @@ MonoBehaviour:
   - {fileID: 1612026175244242381, guid: 9de9bee7fc1038a4eac4324a5a32d357, type: 3}
   - {fileID: 855352844471018051, guid: ebbb8ffe249a8a0469b96e07d35ce5a1, type: 3}
   - {fileID: 4887394871237122788, guid: ea27654041534974e96ae6cb3b7c847f, type: 3}
+  sunsetSprites:
+  - {fileID: 21300000, guid: aeaa63877911b6945a33afe5dadb0c80, type: 3}
+  - {fileID: 21300000, guid: 3f48d7279a6ed5a4bb1eff4a2e4742d9, type: 3}
+  - {fileID: 21300000, guid: bcd566cffe34a3046af4f6cb995cb8d4, type: 3}
   meteorPrefabs:
   - {fileID: 403630370029470438, guid: dbc26a4640dc36843b36e20864bba460, type: 3}
   - {fileID: 89222855114777276, guid: 2bbe77e34ffb3004da33b8b7831a40c6, type: 3}
   - {fileID: 1622502511546128924, guid: 13c5a2e33ab1c5141a68c46dfa770742, type: 3}
-  cloudHeight: 170
-  spaceHeight: 350
+  cloudHeight: 215
+  sunsetCloudHeight: 285
+  spaceHeight: 315
   SafetyZoneColor: {r: 0, g: 1, b: 1, a: 1}
   spawnDist: 3
   hazardPrefabs:
@@ -1066,11 +1067,6 @@ PrefabInstance:
       propertyPath: secondBackground
       value: 
       objectReference: {fileID: 358214610}
-    - target: {fileID: 1164085971475083214, guid: ef43d5b66d359184c96719cc0a9c2022,
-        type: 3}
-      propertyPath: speed
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ef43d5b66d359184c96719cc0a9c2022, type: 3}
 --- !u!1001 &1021724707
@@ -1205,8 +1201,8 @@ MonoBehaviour:
   hazardWarningRight: {fileID: 628565903}
   selectHazard: 0
   timeLeft: 5
-  planeSpawnNow: 270
-  meteorSpawnNow: 350
+  planeSpawnNow: 215
+  meteorSpawnNow: 315
 --- !u!1 &1326220106 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4534799279237491391, guid: 31fbc5deede4332408a682bef5416aa2,
@@ -1740,6 +1736,75 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &4804359828677679890
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8941786684177263157, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_Name
+      value: Anchor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437108797698463920, guid: 092c32bc90e4f5d409c6d04f1c599d72,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 092c32bc90e4f5d409c6d04f1c599d72, type: 3}
 --- !u!1001 &8963127959676921396
 PrefabInstance:
   m_ObjectHideFlags: 0

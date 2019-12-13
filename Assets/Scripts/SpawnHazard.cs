@@ -19,6 +19,8 @@ public class SpawnHazard : MonoBehaviour
     public float meteorSpawnNow;
     private Quaternion hazardRotation;
     float initialTimeLeft;
+    private float height;
+
     void Start()
     {
         selectSide = 0;
@@ -33,6 +35,7 @@ public class SpawnHazard : MonoBehaviour
     {
         timeLeft -= Time.deltaTime;
         spawnerPosition = player.transform.GetChild(0).position;
+        height = player.GetComponent<Catformer.PlayerScript>().GetScore();
 
         if (timeLeft < 2 && timeLeft >= 0.5 && side == "left")
         {
@@ -83,12 +86,12 @@ public class SpawnHazard : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (spawnerPosition.y >= planeSpawnNow && spawnerPosition.y <= meteorSpawnNow)
+            if (height >= planeSpawnNow && height <= meteorSpawnNow)
             {
                 selectHazard = 1;
                 initialTimeLeft = 3;
             }
-            else if (spawnerPosition.y >= meteorSpawnNow)
+            else if (height >= meteorSpawnNow)
             {
                 selectHazard = 2;
                 initialTimeLeft = 2.5f;
@@ -100,13 +103,13 @@ public class SpawnHazard : MonoBehaviour
 
             if (touch.phase == TouchPhase.Began)
             {
-                if (spawnerPosition.y >= planeSpawnNow && spawnerPosition.y <= meteorSpawnNow)
+                if (height >= planeSpawnNow && height <= meteorSpawnNow)
                 {
                     selectHazard = 1;
                     initialTimeLeft = 3;
                 }
             }
-            else if (spawnerPosition.y >= meteorSpawnNow)
+            else if (height >= meteorSpawnNow)
             {
                 selectHazard = 2;
                 initialTimeLeft = 2.5f;

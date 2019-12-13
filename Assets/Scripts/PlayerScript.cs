@@ -27,7 +27,10 @@ namespace Catformer
         float playTime = 0;
 
         public float touchRadius;
+        [HideInInspector]
+        public GameObject anchor = null;
 
+        private float anchorStart;
         private int platformMask;
         private float score = 0;
         private Vector3 lastPosition;
@@ -39,7 +42,6 @@ namespace Catformer
         // Start is called before the first frame update
         void Start()
         {
-            
             targetPlat = gameObject;
             cameraRef = Camera.main;
             mRenderer = GetComponent<SpriteRenderer>();
@@ -77,6 +79,9 @@ namespace Catformer
 
             if (pointsPerPlatform == 0)
                 pointsPerPlatform = 20;
+
+            if (anchor != null)
+                anchorStart = anchor.transform.InverseTransformPoint(cameraRef.transform.position).y * -1f;
         }
 
         private void OnBecameInvisible()
@@ -104,7 +109,9 @@ namespace Catformer
         // Update is called once per frame
         void Update()
         {
-            score += transform.position.y - lastPosition.y;
+            if (anchor != null)
+                score = anchor.transform.InverseTransformPoint(cameraRef.transform.position).y + anchorStart;
+            //score += transform.position.y - lastPosition.y;
             lastPosition = transform.position;
 
             // Checks the distance to the target platform and lets them jump if close enough.

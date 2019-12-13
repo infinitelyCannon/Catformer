@@ -32,8 +32,7 @@ public class BackgroundScroller : MonoBehaviour
     private SpriteRenderer secondRenderer;
     private Stage stage = Stage.Forest;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         mRenderer = GetComponent<SpriteRenderer>();
         mCamera = Camera.main;
@@ -43,6 +42,20 @@ public class BackgroundScroller : MonoBehaviour
         Resize();
         transform.position = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10f)) + Vector3.up * size.y / 2f;
         secondBackground.transform.position = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10f)) + Vector3.up * (size.y + size.y / 2f);
+
+        GameObject anchor = GameObject.Find("Anchor");
+        if (anchor != null && (mRenderer.sprite.name.Contains("forground") || mRenderer.sprite.name.Contains("foreground")))
+        {
+            anchor.transform.localScale = transform.localScale;
+            anchor.transform.position = transform.position;
+            GameObject.FindGameObjectWithTag("Player").GetComponent<Catformer.PlayerScript>().anchor = anchor;
+        }
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
     }
 
     // Update is called once per frame
@@ -91,7 +104,7 @@ public class BackgroundScroller : MonoBehaviour
         {
             renderer.sprite = backgroundStages[stageIndex].sprite;
         }
-        if (renderer.sprite.name.Contains("space"))
+        if (renderer.sprite.name.Contains("space") && transform.childCount > 0)
         {
             renderer.gameObject.GetComponentInChildren<ParticleSystem>().Play();
         }

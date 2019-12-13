@@ -22,9 +22,11 @@ public class PlatformGenerator : MonoBehaviour
     public float spawnRate;
     public Transform[] spawnPoints;
     public GameObject[] templatesCloud;
+    public Sprite[] sunsetSprites;
     public GameObject[] meteorPrefabs;
 
     public float cloudHeight;
+    public float sunsetCloudHeight;
     public float spaceHeight;
 
     [Header("Debug Variables")]
@@ -280,6 +282,8 @@ public class PlatformGenerator : MonoBehaviour
                 if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
                 {
                     platformInstances[i] = Instantiate(templatesCloud[selection], spawnVector, Quaternion.identity) as GameObject;
+                    if (elevation >= sunsetCloudHeight && elevation <= spaceHeight)
+                        platformInstances[i].GetComponent<SpriteRenderer>().sprite = sunsetSprites[Random.Range(0, sunsetSprites.Length)];
                 }
             }
         }
