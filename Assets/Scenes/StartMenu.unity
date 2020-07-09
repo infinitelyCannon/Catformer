@@ -3018,6 +3018,8 @@ MonoBehaviour:
   startMenu: {fileID: 1171691138}
   characterCat: {fileID: 1272339630}
   customizeCat: {fileID: 1440656655}
+  volumeSlider: {fileID: 813257739}
+  soundSlider: {fileID: 328329612}
   currentCharacter: 0
   savedPreferences: {fileID: 1163282507}
   musicAudio: {fileID: 1163282510}

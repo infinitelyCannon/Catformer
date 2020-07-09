@@ -5,12 +5,18 @@ using UnityEngine.UI;
 
 public class TimeManager : MonoBehaviour
 {
+    public GameObject deathOverlay;
+    public GameObject scoreText;
+    public GameObject pauseButton;
 
     private Image background;
+    private Catformer.PlayerScript playerRef;
     // Start is called before the first frame update
     void Start()
     {
         background = GetComponent<Image>();
+        playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<Catformer.PlayerScript>();
+        playerRef.AddDeathListener(OnPlayerDeathTrigger);
     }
 
     // Update is called once per frame
@@ -35,5 +41,14 @@ public class TimeManager : MonoBehaviour
                 transform.GetChild(j).gameObject.SetActive(true);
             Time.timeScale = 0f;
         }
+    }
+
+    public void OnPlayerDeathTrigger()
+    {
+        int points = (int) playerRef.GetScore();
+
+        deathOverlay.SetActive(true);
+        pauseButton.SetActive(false);
+        scoreText.GetComponent<Text>().text = "Score: " + points + "ft";
     }
 }

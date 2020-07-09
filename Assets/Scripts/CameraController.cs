@@ -29,19 +29,21 @@ public class CameraController : MonoBehaviour
         playerRef = GameObject.FindGameObjectWithTag("Player").transform;
         lastPlayerPosition = playerRef.position.y;
         followTarget = GetComponent<Camera>().ViewportToWorldPoint(new Vector3(0.5f, followLine, Z_POS));
+        playerRef.GetComponent<Catformer.PlayerScript>().AddDeathListener(OnPlayerDeathTrigger);
     }
 
     private void Update()
     {
         followTarget = GetComponent<Camera>().ViewportToWorldPoint(new Vector3(0.5f, followLine, Z_POS));
 
-        if (!playerRef.gameObject.GetComponent<Catformer.PlayerScript>().isDead && playerRef.position.y >= followTarget.y && (playerRef.position.y - lastPlayerPosition) >= 0)
+        if (playerRef != null && !playerRef.gameObject.GetComponent<Catformer.PlayerScript>().isDead && playerRef.position.y >= followTarget.y && (playerRef.position.y - lastPlayerPosition) >= 0)
         {
             Vector3 newPos = Vector3.SmoothDamp(new Vector3(0f, transform.position.y, -Z_POS), new Vector3(0f, playerRef.position.y, -Z_POS), ref currentVelocity, damping);
             transform.position = newPos;
         }
 
-        lastPlayerPosition = playerRef.position.y;
+        if(playerRef != null)
+            lastPlayerPosition = playerRef.position.y;
     }
 
     private void OnDrawGizmosSelected()
@@ -54,5 +56,11 @@ public class CameraController : MonoBehaviour
     public Vector3 getVelocity()
     {
         return currentVelocity;
+    }
+
+    public void OnPlayerDeathTrigger()
+    {
+        playerRef = null;
+        currentVelocity = Vector3.zero;
     }
 }

@@ -975,7 +975,7 @@ MonoBehaviour:
   - {fileID: 89222855114777276, guid: 2bbe77e34ffb3004da33b8b7831a40c6, type: 3}
   - {fileID: 1622502511546128924, guid: 13c5a2e33ab1c5141a68c46dfa770742, type: 3}
   cloudHeight: 170
-  spaceHeight: 350
+  spaceHeight: 330
   SafetyZoneColor: {r: 0, g: 1, b: 1, a: 1}
   spawnDist: 3
   hazardPrefabs:

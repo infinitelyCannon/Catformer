@@ -7,6 +7,9 @@ namespace Catformer
 {
     public class PlayerScript : MonoBehaviour
     {
+        public delegate void PlayerDeath();
+        public event PlayerDeath onPlayerDeath;
+        
         Camera cameraRef;
         SpriteRenderer mRenderer;
         public Vector3 targetMove;
@@ -86,17 +89,13 @@ namespace Catformer
 
         private void OnBecameInvisible()
         {
-            System.TimeSpan secs = System.TimeSpan.FromSeconds(playTime);
-            if (deathScreen == null)
-                return;
-            Text deathText = deathScreen.GetComponentInChildren<Text>();
-
             isDead = true;
             hurtAudio.Play();
             //Meow audio delay
             StartCoroutine(DeathAudio(soundDelay));
-            deathScreen.SetActive(true);
-            deathText.text = "Score: " + string.Format("{0:n2}ft", score);
+            //deathScreen.SetActive(true);
+            //deathText.text = "Score: " + (int)score; //string.Format("{0:n2}ft", score);
+            onPlayerDeath?.Invoke();
         }
 
         private void OnGUI()
@@ -184,7 +183,7 @@ namespace Catformer
                 }
             MoveOn:
                 playTime += Time.deltaTime;
-                scoreText.text = "" + string.Format("{0:n2}", score) + "ft";
+                scoreText.text = "" + (int)score + "ft"; //string.Format("{0:n2}", score) + "ft";
             }
         }
 
@@ -257,6 +256,11 @@ namespace Catformer
             //meowAudio.Play();
             yield return new WaitForSeconds(delay);
             meowAudio.Play();
+        }
+
+        public void AddDeathListener(PlayerDeath func)
+        {
+            onPlayerDeath += func;
         }
     }
 }

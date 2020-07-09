@@ -20,6 +20,8 @@ using UnityEngine.SceneManagement;
         public GameObject startMenu;
         public GameObject characterCat;
         public GameObject customizeCat;
+        public GameObject volumeSlider;
+        public GameObject soundSlider;
         public int currentCharacter;
         public GameObject savedPreferences;
         private float snd;
@@ -46,19 +48,32 @@ using UnityEngine.SceneManagement;
 
         private void Start()
         {
-
+            //CharacterSelect
             currentCharacter = PlayerPrefs.GetInt("CharacterSelected");
             characterAnimation = PlayerPrefs.GetInt("AnimationInt");
-            //vol = PlayerPrefs.GetFloat("MusicVolume", vol);
-           // snd = PlayerPrefs.GetFloat("SoundVolume", snd);
-            //musicVolume = vol;
-           // soundVolume = snd;
             characterY = characterX[characterAnimation];
-            hints = true;
             characterCat.GetComponent<Image>().sprite = characterList[currentCharacter];
             customizeCat.GetComponent<Image>().sprite = characterList[currentCharacter];
+            //VolumeControls
+            vol = PlayerPrefs.GetFloat("MusicVolume", vol);
+            snd = PlayerPrefs.GetFloat("SoundVolume", snd);
+            musicVolume = vol;
+            soundVolume = snd;
             musicAudio = GetComponents<AudioSource>()[0];
             soundAudio = GetComponents<AudioSource>()[1];
+            volumeSlider.GetComponent<Slider>().value = vol;
+            soundSlider.GetComponent<Slider>().value = snd;
+            if (PlayerPrefs.GetFloat("Hint") == 0)
+            {
+                hints = false;
+            }
+            else
+            {
+                hints = true;
+            }
+            
+            
+            Debug.Log(vol);
         }
         void Update()
         {
@@ -153,11 +168,12 @@ using UnityEngine.SceneManagement;
                 hintImages[i].SetActive(false);
             }
             hints = false;
-
+            PlayerPrefs.SetFloat("Hints", 0);
         }
         public void YesHints()
         {
             hints = true;
+            PlayerPrefs.SetFloat("Hints", 1);
         }
         public void NextCharacter()
         {
@@ -198,11 +214,7 @@ using UnityEngine.SceneManagement;
             PlayerPrefs.SetInt("AnimationInt", characterAnimation);
             PlayerPrefs.SetString("AnimationSelected", characterY);
         }
-        public void SoundSettingSelected()
-        {
-            PlayerPrefs.SetFloat("MusicVolume", vol);
-            PlayerPrefs.SetFloat("SoundVolume", snd);
-        }
+      
         public void ChangedCharacter()
         {
             customizeCat.GetComponent<Image>().sprite = characterList[currentCharacter];
@@ -211,13 +223,13 @@ using UnityEngine.SceneManagement;
         public void SetMusicVolume(float vol)
         {
             musicVolume = vol;
-            SoundSettingSelected();
+            PlayerPrefs.SetFloat("MusicVolume", vol);
         }
 
         public void SetSoundVolume(float snd)
         {
             soundVolume = snd;
-            SoundSettingSelected();
+            PlayerPrefs.SetFloat("SoundVolume", snd);
         }
         public void PlaySoundEffect()
         {
