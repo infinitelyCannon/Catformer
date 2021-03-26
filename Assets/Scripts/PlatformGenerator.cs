@@ -5,334 +5,325 @@ using Catformer;
 
 public class PlatformGenerator : MonoBehaviour
 {
-    public enum SpawnUnits
-    {
-        World,
-        Camera
-    }
+	public enum SpawnUnits
+	{
+		World,
+		Camera
+	}
 
-    public enum Place
-    {
-        Forest,
-        Sky,
-        Space
-    };
+	public enum Place
+	{
+		Forest,
+		Sky,
+		Space
+	};
 
-    public GameObject[] templates;
-    public float spawnRate;
-    public Transform[] spawnPoints;
-    public GameObject[] templatesCloud;
-    public Sprite[] sunsetSprites;
-    public GameObject[] meteorPrefabs;
+	public GameObject Template;
+	public float spawnRate;
+	public Transform[] spawnPoints;
+	public PlatformData[] leafData;
+	public PlatformData[] cloudData;
+	public Sprite[] sunsetSprites;
+	public PlatformData[] meteorData;
 
-    public float cloudHeight;
-    public float sunsetCloudHeight;
-    public float spaceHeight;
+	public float cloudHeight;
+	public float sunsetCloudHeight;
+	public float spaceHeight;
 
-    [Header("Debug Variables")]
-    public Color SafetyZoneColor = Color.cyan;
+	public int MaxPlatforms = 20;
+	public Vector3 StartLocation;
 
-    private float timer = 0f;
-    private int[] weights = { 3, 3, 3};
+	[Header("Debug Variables")]
+	public Color SafetyZoneColor = Color.cyan;
 
-    private float SpawnHeight;
-    private PlayerScript playerRef;
-    private Camera mCamera;
+	private float timer = 0f;
+	private int[] weights = { 3, 3, 3};
 
-    private const float PLATFORM_WIDTH = 17.17f * 0.2720631f;
-    private const float PLATFORM_HEIGHT = 8.29f * 0.2720631f;
+	private float SpawnHeight;
+	private PlayerScript playerRef;
+	private Camera mCamera;
 
-    private GameObject platformInstance; //Matt: To be called in the platform script
-    private GameObject[] platformInstances;
-    private Vector3 spawnVector;
-    public float spawnDist = 0f;
+	private const float PLATFORM_WIDTH = 17.17f * 0.2720631f;
+	private const float PLATFORM_HEIGHT = 8.29f * 0.2720631f;
 
-    private Vector3 spawnVectorHazard;
-    public GameObject[] hazardPrefabs;
-    private GameObject hazardInstance;
+	private GameObject platformInstance; //Matt: To be called in the platform script
+	private GameObject[] platformInstances;
+	private Vector3 spawnVector;
+	public float spawnDist = 0f;
 
-    private float elevation = 0f;
-    private float mTime = 0;
+	private Vector3 spawnVectorHazard;
+	public GameObject[] hazardPrefabs;
+	private GameObject hazardInstance;
 
-    private void Awake()
-    {
-        playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
-    }
+	private float elevation = 0f;
+	private float mTime = 0;
+	private List<GameObject> Platforms;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        mCamera = Camera.main;
-        platformInstances = new GameObject[spawnPoints.Length];
-    }
+	private void Awake()
+	{
+		playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
+	}
 
-    // Update is called once per frame
-    void Update()
-    {
-        // The target the player will move to.
-        GameObject startPoint;
-        elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
+	// Start is called before the first frame update
+	void Start()
+	{
+		mCamera = Camera.main;
+		platformInstances = new GameObject[spawnPoints.Length];
+		Platforms = new List<GameObject>(MaxPlatforms);
 
-        // The position of the green line the camera uses to follow the player
-        Vector3 followLine = mCamera.ViewportToWorldPoint(new Vector3(0.5f, mCamera.gameObject.GetComponent<CameraController>().followLine, 10f));
+		for (int i = 0; i < MaxPlatforms; ++i)
+		{
+			GameObject platform = Instantiate(Template, StartLocation, Quaternion.identity, transform);
+			platform.SetActive(false);
+			Platforms.Add(platform);
+		}
+	}
 
-        // The top, right, and left edges of the camera.
-        Vector3 topEdge = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10f));
-        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
-        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+	// Update is called once per frame
+	void Update()
+	{
+		// The target the player will move to.
+		GameObject startPoint;
 
-        if(elevation <= cloudHeight && Time.timeScale > 0)
-        {
-            mTime += Time.deltaTime;
-            if(mTime >= spawnRate)
-            {
-                SpawnPlatforms(topEdge.y);
-                mTime -= mTime;
-            }
-        }
+		if (playerRef == null)
+			return;
+		
+		elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
 
-        // On click . . .
-        if (Time.timeScale > 0 && Input.GetMouseButtonDown(0))
-        {
-            // Grab the player's target platform.
-            startPoint = playerRef.GetTarget();
+		// The position of the green line the camera uses to follow the player
+		Vector3 followLine = mCamera.ViewportToWorldPoint(new Vector3(0.5f, mCamera.gameObject.GetComponent<CameraController>().followLine, 10f));
 
-            // If that platform exists, it's not the player, and it's higher than the camera's follow line,
-            if(startPoint != null 
-                && startPoint != playerRef.gameObject 
-                && startPoint.transform.position.y > followLine.y)
-            {
-                /*
-                    Get the vertical distance between the platform and the follow line,
-                    and spawn a new platform somewhere inside that distance above the top of the camera.
-                    (Also picks a random X coordinate).
-                 */
-                SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
-                //Holds random spawn vector
-                elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
-                if (elevation >= cloudHeight && elevation <= spaceHeight)
-                    SpawnClouds(topEdge.y);
-                else if (elevation >= spaceHeight)
-                    SpawnMeteors(topEdge.y);
-            }
-        }
-        // Or on touch . . .
-        else if(Time.timeScale > 0 && Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Began)
-        {
-            // Grab the player's target platform.
-            startPoint = playerRef.GetTarget();
+		// The top, right, and left edges of the camera.
+		Vector3 topEdge = mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10f));
 
-            // If that platform exists, it's not the player, and it's higher than the camera's follow line,
-            if (startPoint != null
-                && startPoint != playerRef.gameObject
-                && startPoint.transform.position.y > followLine.y)
-            {
-                /*
-                    Get the vertical distance between the platform and the follow line,
-                    and spawn a new platform somewhere inside that distance above the top of the camera.
-                    (Also picks a random X coordinate).
-                 */
-                SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
-                //Finds elevation to reference transitions
-                elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
-                if (elevation > cloudHeight && elevation <= spaceHeight)
-                    SpawnClouds(topEdge.y);
-                else if (elevation >= spaceHeight)
-                    SpawnMeteors(topEdge.y);
-            }
-        }
-    }
+		/*
+		 * If we're in the forest stage,
+		 * spawn a leaf after each spawn rate
+		 */
+		if(elevation <= cloudHeight && Time.timeScale > 0)
+		{
+			mTime += Time.deltaTime;
+			if(mTime >= spawnRate)
+			{
+				SpawnPlatforms(topEdge.y + 5);
+				mTime -= mTime;
+			}
+		}
 
-    float FindSecondSide(Vector3 size1, Vector3 size2, float xSpot)
-    {
-        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
-        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
+		// On click . . .
+		if (Time.timeScale > 0 && Input.GetMouseButtonDown(0))
+		{
+			// Grab the player's target platform.
+			startPoint = playerRef.GetTarget();
 
-        if(xSpot > 0)
-        {
-            return Random.Range(leftEdge.x + (size2.x / 2f), xSpot - (size1.x / 2f));
-        }
-        else
-        {
-            return Random.Range(xSpot + (size1.x / 2f), rightEdge.x - (size2.x / 2f));
-        }
-    }
+			// If that platform exists, it's not the player, and it's higher than the camera's follow line,
+			if(startPoint != null 
+				&& startPoint != playerRef.gameObject 
+				&& startPoint.transform.position.y > followLine.y)
+			{
+				/*
+					Get the vertical distance between the platform and the follow line,
+					and spawn a new platform somewhere inside that distance above the top of the camera.
+					(Also picks a random X coordinate).
+				 */
+				SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
+				//Holds random spawn vector
+				elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
+				if (elevation >= cloudHeight && elevation <= spaceHeight)
+					SpawnClouds(topEdge.y + 5);
+				else if (elevation >= spaceHeight)
+					SpawnMeteors(topEdge.y + 5);
+			}
+		}
+		// Or on touch . . .
+		else if(Time.timeScale > 0 && Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Began)
+		{
+			// Grab the player's target platform.
+			startPoint = playerRef.GetTarget();
 
-    private bool DoesOverlap(Vector3 location, Vector3 size)
-    {
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(location, size, 0f, LayerMask.GetMask("Platforms"));
+			// If that platform exists, it's not the player, and it's higher than the camera's follow line,
+			if (startPoint != null
+				&& startPoint != playerRef.gameObject
+				&& startPoint.transform.position.y > followLine.y)
+			{
+				/*
+					Get the vertical distance between the platform and the follow line,
+					and spawn a new platform somewhere inside that distance above the top of the camera.
+					(Also picks a random X coordinate).
+				 */
+				SpawnHeight = Mathf.Abs(startPoint.transform.position.y - followLine.y);
+				//Finds elevation to reference transitions
+				elevation = playerRef.gameObject.GetComponent<Catformer.PlayerScript>().GetScore();
+				if (elevation > cloudHeight && elevation <= spaceHeight)
+					SpawnClouds(topEdge.y + 5);
+				else if (elevation >= spaceHeight)
+					SpawnMeteors(topEdge.y + 5);
+			}
+		}
+	}
 
-        if (colliders.Length > 0)
-            return true;
+	float FindSecondSide(Vector3 size1, Vector3 size2, float xSpot)
+	{
+		Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+		Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
 
-        return false;
-    }
+		if(xSpot > 0)
+		{
+			return Random.Range(leftEdge.x + (size2.x / 2f), xSpot - (size1.x / 2f));
+		}
+		else
+		{
+			return Random.Range(xSpot + (size1.x / 2f), rightEdge.x - (size2.x / 2f));
+		}
+	}
 
-    void SpawnMeteors(float topEdgeY)
-    {
-        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
-        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
-        float xSpot;
+	private bool DoesOverlap(Vector3 location, Vector3 size)
+	{
+		Collider2D[] colliders = Physics2D.OverlapBoxAll(location, size, 0f, LayerMask.GetMask("Platforms"));
 
-        for (int i = 0; i < spawnPoints.Length; i++)
-        {
-            int selection = Random.Range(0, meteorPrefabs.Length);
+		if (colliders.Length > 0)
+			return true;
 
-            Vector3 size = meteorPrefabs[selection].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection].transform.localScale.x;
-            xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+		return false;
+	}
 
-            spawnVector = new Vector3(
-                        xSpot,//Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f),
-                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f);
+	private int GetPlatform(PlatformData[] choices, int choice, Vector3 position)
+	{
+		int index = 0;
 
-            if(!DoesOverlap(spawnVector, size))
-            {
-                if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
-                {
-                    platformInstances[i] = Instantiate(meteorPrefabs[selection], spawnVector, Quaternion.identity) as GameObject;
-                }
-            }
-        }
-    }
+		for (; index < Platforms.Count; ++index)
+		{
+			if (!Platforms[index].activeSelf)
+			{
+				Platforms[index].GetComponent<Platform>().Restart(choices[choice], position);
+				return index;
+			}
+		}
 
-    void SpawnPlatforms(float topEdgeY)
-    {
-        int spot = Random.Range(1, 4);
-        float camWidth = Vector3.Distance(
-            mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f)),
-            mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f))
-            );
-        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
-        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
+		Platforms.Sort(delegate(GameObject x, GameObject y) 
+		{
+			if (x == null || y == null) return 0;
+			return x.transform.position.y.CompareTo(y.transform.position.y);
+		});
 
+		Debug.Log("No free platform.\nGrabbing lowest one...");
+		Platforms[0].GetComponent<Platform>().Restart(choices[choice], position);
+		return 0;
+	}
 
-        if (spot == 1)
-        {
-            int selection = Random.Range(0, templates.Length);
-            Vector3 size = templates[selection].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection].transform.localScale.x;
-            float xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+	void SpawnMeteors(float topEdgeY)
+	{
+		Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+		Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
+		float xSpot;
 
-            spawnVector = new Vector3(
-                        xSpot,
-                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f);
-            if(!DoesOverlap(spawnVector, size))
-                Instantiate(templates[selection], spawnVector, Quaternion.identity);
-        }
-        else if (spot == 2)
-        {
-            int selection = Random.Range(0, templates.Length);
-            Vector3 size = templates[selection].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection].transform.localScale.x;
-            float xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+		for (int i = 0; i < spawnPoints.Length; i++)
+		{
+			int selection = Random.Range(0, meteorData.Length);
 
-            spawnVector = new Vector3(
-                        xSpot,
-                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f);
-            if(!DoesOverlap(spawnVector, size))
-                Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
-        }
-        else // spot == 3
-        {
-            int selection1 = Random.Range(0, templates.Length);
-            Vector3 size = templates[selection1].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection1].transform.localScale.x;
-            float xSpot1 = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+			Vector3 size = meteorData[selection].sprite.bounds.size * meteorData[selection].Scale.x;
+			xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
 
-            int selection2 = Random.Range(0, templates.Length);
-            Vector3 size2 = templates[selection2].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection2].transform.localScale.x;
-            float xSpot2 = FindSecondSide(size, size2, xSpot1);
+			spawnVector = new Vector3(
+						xSpot,//Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f),
+						Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+						0f);
 
-            spawnVector = new Vector3(
-                        xSpot1,
-                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f);
-            if(!DoesOverlap(spawnVector, size))
-                Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
+			if(!DoesOverlap(spawnVector, size))
+			{
+				if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
+				{
+					platformInstances[i] = Platforms[GetPlatform(meteorData, selection, spawnVector)];//Instantiate(meteorPrefabs[selection], spawnVector, Quaternion.identity, transform) as GameObject;
+				}
+			}
+		}
+	}
 
-            spawnVector = new Vector3(
-                        xSpot2,
-                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f);
-            if(!DoesOverlap(spawnVector, size2))
-                Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity);
-        }
-    }
+	void SpawnPlatforms(float topEdgeY)
+	{
+		int spot = Random.Range(1, 4);
+		Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+		Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
 
-    void SpawnClouds(float topEdgeY)
-    {
-        Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
-        Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
-        float xSpot;
+		if (spot == 1)
+		{
+			int selection = Random.Range(0, leafData.Length);
+			Vector3 size = leafData[selection].sprite.bounds.size * leafData[selection].Scale.x;
+			float xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
 
-        for (int i = 0; i < spawnPoints.Length; i++)
-        {
-            int selection = Random.Range(0, templatesCloud.Length);
+			spawnVector = new Vector3(
+						xSpot,
+						Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+						0f);
+			if (!DoesOverlap(spawnVector, size))
+				GetPlatform(leafData, selection, spawnVector);
+		}
+		else if (spot == 2)
+		{
+			int selection = Random.Range(0, leafData.Length);
+			Vector3 size = leafData[selection].sprite.bounds.size * leafData[selection].Scale.x;
+			float xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
 
-            Vector3 size = templatesCloud[selection].GetComponent<SpriteRenderer>().sprite.bounds.size * templates[selection].transform.localScale.x;
-            xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
+			spawnVector = new Vector3(
+						xSpot,
+						Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+						0f);
+			if (!DoesOverlap(spawnVector, size))
+				GetPlatform(leafData, selection, spawnVector);//Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity, transform);
+		}
+		else // spot == 3
+		{
+			int selection1 = Random.Range(0, leafData.Length);
+			Vector3 size = leafData[selection1].sprite.bounds.size * leafData[selection1].Scale.x;
+			float xSpot1 = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
 
-            spawnVector = new Vector3(
-                        xSpot,//Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f),
-                        Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-                        0f);
+			int selection2 = Random.Range(0, leafData.Length);
+			Vector3 size2 = leafData[selection2].sprite.bounds.size * leafData[selection2].Scale.x;
+			float xSpot2 = FindSecondSide(size, size2, xSpot1);
 
-            if (!DoesOverlap(spawnVector, size))
-            {
-                if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
-                {
-                    platformInstances[i] = Instantiate(templatesCloud[selection], spawnVector, Quaternion.identity) as GameObject;
-                    if (elevation >= sunsetCloudHeight && elevation <= spaceHeight)
-                        platformInstances[i].GetComponent<SpriteRenderer>().sprite = sunsetSprites[Random.Range(0, sunsetSprites.Length)];
-                }
-            }
-        }
-    }
+			spawnVector = new Vector3(
+						xSpot1,
+						Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+						0f);
+			if(!DoesOverlap(spawnVector, size))
+				GetPlatform(leafData, Random.Range(0, leafData.Length), spawnVector);//Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity, transform);
 
-    void SpawnHazard(float topEdgeY)
-    {
-        spawnVectorHazard = new Vector3(
-            0f,
-            Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
-            0f);
-        if(hazardInstance == null || spawnVector.y - hazardInstance.transform.position.y > spawnDist)
-        {
-            hazardInstance = Instantiate(hazardPrefabs[0], spawnVectorHazard, Quaternion.identity) as GameObject;
-        }
-    }
+			spawnVector = new Vector3(
+						xSpot2,
+						Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+						0f);
+			if(!DoesOverlap(spawnVector, size2))
+				GetPlatform(leafData, Random.Range(0, leafData.Length), spawnVector);//Instantiate(templates[Random.Range(0, templates.Length)], spawnVector, Quaternion.identity, transform);
+		}
+	}
 
-    int Sum(int[] arr)
-    {
-        int result = 0;
+	void SpawnClouds(float topEdgeY)
+	{
+		Vector3 leftEdge = mCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+		Vector3 rightEdge = mCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, 10f));
+		float xSpot;
 
-        for (int i = 0; i < arr.Length; i++)
-            result += arr[i];
+		for (int i = 0; i < spawnPoints.Length; i++)
+		{
+			int selection = Random.Range(0, cloudData.Length);
 
-        return result;
-    }
+			Vector3 size = cloudData[selection].sprite.bounds.size * cloudData[selection].Scale.x;
+			xSpot = Random.Range(leftEdge.x + (size.x / 2f), rightEdge.x - (size.x / 2f));
 
-    void ShiftWeights(int index)
-    {
-        switch (index)
-        {
-            case 1:
-            case 2:
-                weights[1] -= 1;
-                weights[2] -= 1;
-                weights[0] += 1;
-                break;
-            case 0:
-                weights[1] += 1;
-                weights[2] += 1;
-                weights[0] -= 1;
-                break;
-            default:
-                break;
-        }
-    }
+			spawnVector = new Vector3(
+						xSpot,//Random.Range(spawnPoints[i].position.x + 1f, spawnPoints[i].position.x - 1f),
+						Random.Range(topEdgeY + (PLATFORM_HEIGHT / 2f), (topEdgeY + SpawnHeight) - (PLATFORM_HEIGHT / 2f)),
+						0f);
 
-    int IndexToPlatform(int idx)
-    {
-        return (idx > 0) ? 1 : 0;
-    }
+			if (!DoesOverlap(spawnVector, size))
+			{
+				if (platformInstances[i] == null || spawnVector.y - platformInstances[i].transform.position.y > spawnDist) //Matt
+				{
+					platformInstances[i] = Platforms[GetPlatform(cloudData, selection, spawnVector)];//Instantiate(templatesCloud[selection], spawnVector, Quaternion.identity, transform) as GameObject;
+					if (elevation >= sunsetCloudHeight && elevation <= spaceHeight)
+						platformInstances[i].GetComponent<SpriteRenderer>().sprite = sunsetSprites[Random.Range(0, sunsetSprites.Length)];
+				}
+			}
+		}
+	}
 }

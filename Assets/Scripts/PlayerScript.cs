@@ -5,262 +5,270 @@ using UnityEngine.UI;
 
 namespace Catformer
 {
-    public class PlayerScript : MonoBehaviour
-    {
-        public delegate void PlayerDeath();
-        public event PlayerDeath onPlayerDeath;
-        
-        Camera cameraRef;
-        SpriteRenderer mRenderer;
-        public Vector3 targetMove;
-        public Vector3 prevMove;
-        public float speed;
-        public GameObject player;
-        public Collider2D hitPlatform;
-        public AudioSource jumpAudio;
-        public AudioSource hurtAudio;
-        public AudioSource meowAudio;
-        public Animator catAnimator;
-        public bool canJump;
-        public int pointsPerPlatform;
+	public class PlayerScript : MonoBehaviour
+	{
+		public delegate void PlayerDeath();
+		public event PlayerDeath onPlayerDeath;
+		
+		Camera cameraRef;
+		SpriteRenderer mRenderer;
+		public Vector3 targetMove;
+		public Vector3 prevMove;
+		public float speed;
+		public GameObject player;
+		public Collider2D hitPlatform;
+		public AudioSource jumpAudio;
+		public AudioSource hurtAudio;
+		public AudioSource meowAudio;
+		public Animator catAnimator;
+		public bool canJump;
+		public int pointsPerPlatform;
 
-        GameObject targetPlat;
-        [HideInInspector]
-        public bool isDead = false;
-        float playTime = 0;
+		GameObject targetPlat;
+		[HideInInspector]
+		public bool isDead = false;
+		float playTime = 0;
 
-        public float touchRadius;
-        [HideInInspector]
-        public GameObject anchor = null;
+		public float touchRadius;
+		[HideInInspector]
+		public GameObject anchor = null;
 
-        private float anchorStart;
-        private int platformMask;
-        private float score = 0;
-        private Vector3 lastPosition;
+		private float anchorStart;
+		private int platformMask;
+		private float score = 0;
+		private Vector3 lastPosition;
 
-        public GameObject deathScreen;
-        public Text scoreText;
-        public float soundDelay = 0.5f;
+		public GameObject deathScreen;
+		public Text scoreText;
+		public float soundDelay = 0.5f;
 
-        // Start is called before the first frame update
-        void Start()
-        {
-            targetPlat = gameObject;
-            cameraRef = Camera.main;
-            mRenderer = GetComponent<SpriteRenderer>();
-            platformMask = LayerMask.GetMask("Platforms");
-            lastPosition = transform.position;
-            canJump = true;
-            float halfWidth = mRenderer.sprite.bounds.extents.x;
-            Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
-            Vector3 leftEdge = cameraRef.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
-            Vector3 leftSpot = leftEdge + new Vector3(halfWidth, 0f, 0f);
-            Vector3 rightSpot = rightEdge - new Vector3(halfWidth, 0f, 0f);
-            if (transform.position.x < leftSpot.x && transform.position.x < cameraRef.transform.position.x)
-                transform.position = new Vector3(leftSpot.x, transform.position.y, 0f);
-            else if (transform.position.x > rightSpot.x && transform.position.x > cameraRef.transform.position.x)
-                transform.position = new Vector3(rightSpot.x, transform.position.y, 0f);
+		private CheatPlayer CheatMode;
 
-            targetMove = transform.position;
+		// Start is called before the first frame update
+		void Start()
+		{
+			targetPlat = gameObject;
+			cameraRef = Camera.main;
+			mRenderer = GetComponent<SpriteRenderer>();
+			platformMask = LayerMask.GetMask("Platforms");
+			lastPosition = transform.position;
+			canJump = true;
+			float halfWidth = mRenderer.sprite.bounds.extents.x;
+			Vector3 rightEdge = cameraRef.ViewportToWorldPoint(new Vector3(1.0f, 0.5f, 10f));
+			Vector3 leftEdge = cameraRef.ViewportToWorldPoint(new Vector3(0f, 0.5f, 10f));
+			Vector3 leftSpot = leftEdge + new Vector3(halfWidth, 0f, 0f);
+			Vector3 rightSpot = rightEdge - new Vector3(halfWidth, 0f, 0f);
+			if (transform.position.x < leftSpot.x && transform.position.x < cameraRef.transform.position.x)
+				transform.position = new Vector3(leftSpot.x, transform.position.y, 0f);
+			else if (transform.position.x > rightSpot.x && transform.position.x > cameraRef.transform.position.x)
+				transform.position = new Vector3(rightSpot.x, transform.position.y, 0f);
 
-            // Insert the pause and death screens if they don't exist.
-            if (deathScreen == null && scoreText == null)
-            {
-                GameObject screen = (GameObject) Instantiate(Resources.Load("GameHUD", typeof(GameObject)), Vector3.zero, Quaternion.identity);
-                GameObject text =  (GameObject) Instantiate(Resources.Load("EventSystem", typeof(GameObject)), Vector3.zero, Quaternion.identity);
+			targetMove = transform.position;
 
-                deathScreen = screen.transform.GetChild(2).gameObject; //GameObject.Find("DeathOverlay");
-                scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
-            }
+			// Insert the pause and death screens if they don't exist.
+			if (deathScreen == null && scoreText == null)
+			{
+				GameObject screen = (GameObject) Instantiate(Resources.Load("GameHUD", typeof(GameObject)), Vector3.zero, Quaternion.identity);
+				GameObject text =  (GameObject) Instantiate(Resources.Load("EventSystem", typeof(GameObject)), Vector3.zero, Quaternion.identity);
 
-            AudioSource[] sources = GetComponents<AudioSource>();
-            foreach(AudioSource source in sources)
-            {
-                if(Catformer.SavedPreferences.instance != null)
-                    source.volume = Catformer.SavedPreferences.instance.soundVolume;
-            }
+				deathScreen = screen.transform.GetChild(2).gameObject; //GameObject.Find("DeathOverlay");
+				scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
+			}
 
-            if (pointsPerPlatform == 0)
-                pointsPerPlatform = 20;
+			AudioSource[] sources = GetComponents<AudioSource>();
+			foreach(AudioSource source in sources)
+			{
+				if(Catformer.SavedPreferences.instance != null)
+					source.volume = Catformer.SavedPreferences.instance.soundVolume;
+			}
 
-            if (anchor != null)
-                anchorStart = anchor.transform.InverseTransformPoint(cameraRef.transform.position).y * -1f;
-        }
+			if (pointsPerPlatform == 0)
+				pointsPerPlatform = 20;
 
-        private void OnBecameInvisible()
-        {
-            isDead = true;
-            hurtAudio.Play();
-            //Meow audio delay
-            StartCoroutine(DeathAudio(soundDelay));
-            //deathScreen.SetActive(true);
-            //deathText.text = "Score: " + (int)score; //string.Format("{0:n2}ft", score);
-            onPlayerDeath?.Invoke();
-        }
+			if (anchor != null)
+				anchorStart = anchor.transform.InverseTransformPoint(cameraRef.transform.position).y * -1f;
 
-        private void OnGUI()
-        {
+			CheatMode = GetComponent<CheatPlayer>();
+		}
 
-        }
+		private void OnBecameInvisible()
+		{
+			if (gameObject == null || !gameObject.activeSelf)
+				return;
 
+			isDead = true;
+			hurtAudio.Play();
+			//Meow audio delay
+			StartCoroutine(DeathAudio(soundDelay));
+			//deathScreen.SetActive(true);
+			//deathText.text = "Score: " + (int)score; //string.Format("{0:n2}ft", score);
+			onPlayerDeath?.Invoke();
+		}
 
+		private void OnGUI()
+		{
+			
+		}
 
-        // Update is called once per frame
-        void Update()
-        {
-            if (anchor != null)
-                score = anchor.transform.InverseTransformPoint(cameraRef.transform.position).y + anchorStart;
-            //score += transform.position.y - lastPosition.y;
-            lastPosition = transform.position;
+		// Update is called once per frame
+		void Update()
+		{
+			if (CheatMode != null)
+				return;
 
-            // Checks the distance to the target platform and lets them jump if close enough.
-            if (Vector3.Distance(transform.position, targetMove) <= 0.01f)
-                CheckJump();
+			if (anchor != null)
+				score = anchor.transform.InverseTransformPoint(cameraRef.transform.position).y + anchorStart;
+			//score += transform.position.y - lastPosition.y;
+			lastPosition = transform.position;
 
-            if (!isDead && Time.timeScale > 0)
-            {
-                if (targetPlat != null && targetPlat.transform.childCount > 1)
-                    targetMove = targetPlat.transform.GetChild(0).position;
-                if (targetPlat == null)
-                {
-                    transform.position = Vector3.MoveTowards(transform.position, new Vector3(0, -50f, 10f), speed * Time.deltaTime);
-                    canJump = false;
-                }
-                else
-                {
-                    transform.position = Vector3.MoveTowards(transform.position, targetMove, speed * Time.deltaTime);
-                }
-                    
+			// Checks the distance to the target platform and lets them jump if close enough.
+			if (Vector3.Distance(transform.position, targetMove) <= 0.01f)
+				CheckJump();
 
-                if (transform.parent != null)
-                {
-                    transform.localPosition = Vector3.zero;
-                }
+			if (!isDead && Time.timeScale > 0)
+			{
+				if (targetPlat != null && targetPlat.transform.childCount > 1)
+					targetMove = targetPlat.transform.GetChild(0).position;
+				if (targetPlat == null)
+				{
+					transform.position = Vector3.MoveTowards(transform.position, new Vector3(0, -50f, 10f), speed * Time.deltaTime);
+					canJump = false;
+				}
+				else
+				{
+					transform.position = Vector3.MoveTowards(transform.position, targetMove, speed * Time.deltaTime);
+				}
+					
 
-                if (Input.touchCount > 0)
-                {
-                    Touch touch = Input.touches[0];
+				if (transform.parent != null)
+				{
+					transform.localPosition = Vector3.zero;
+				}
 
-                    if (touch.phase == TouchPhase.Began)
-                    {
+				if (Input.touchCount > 0)
+				{
+					Touch touch = Input.touches[0];
 
-                        Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(touch.position), touchRadius, platformMask);
-                        if (canJump && hit.gameObject == targetPlat)
-                            goto MoveOn;
-                        if (hit != null && canJump == true)
-                        {
-                            if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
-                            {
-                                targetMove = hit.transform.GetChild(0).position;
-                                targetPlat = hit.gameObject;
-                                jumpAudio.Play();
-                                catAnimator.SetBool("isJumping", true);
+					if (touch.phase == TouchPhase.Began)
+					{
 
-                                canJump = false;
-                            }
-                        }
-                    }
-                }
-                else if (Input.GetMouseButtonDown(0))
-                {
-                    
-                    Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(Input.mousePosition), touchRadius, platformMask);
-                    if (canJump && hit != null && hit.gameObject == targetPlat)
-                        goto MoveOn;
-                    if (hit != null && canJump == true)
-                    {
-                        
-                        if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
-                        {
-                            targetMove = hit.transform.GetChild(0).position;
-                            targetPlat = hit.gameObject;
-                            jumpAudio.Play();
-                            catAnimator.SetBool("isJumping", true);
-                        }
+						Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(touch.position), touchRadius, platformMask);
+						if (canJump && hit.gameObject == targetPlat)
+							goto MoveOn;
+						if (hit != null && canJump == true)
+						{
+							if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
+							{
+								targetMove = hit.transform.GetChild(0).position;
+								targetPlat = hit.gameObject;
+								jumpAudio.Play();
+								catAnimator.SetBool("isJumping", true);
 
-                        canJump = false;
-                    }
-                }
-            MoveOn:
-                playTime += Time.deltaTime;
-                scoreText.text = "" + (int)score + "ft"; //string.Format("{0:n2}", score) + "ft";
-            }
-        }
+								canJump = false;
+							}
+						}
+					}
+				}
+				else if (Input.GetMouseButtonDown(0))
+				{
+					
+					Collider2D hit = Physics2D.OverlapCircle(cameraRef.ScreenToWorldPoint(Input.mousePosition), touchRadius, platformMask);
+					if (canJump && hit != null && hit.gameObject == targetPlat)
+						goto MoveOn;
+					if (hit != null && canJump == true)
+					{
+						
+						if (hit.gameObject.GetComponent<Platform>() != null && hit.gameObject.GetComponent<Platform>().isGood)
+						{
+							targetMove = hit.transform.GetChild(0).position;
+							targetPlat = hit.gameObject;
+							jumpAudio.Play();
+							catAnimator.SetBool("isJumping", true);
+						}
 
-        //This function resets canJump and sprites.
-        private void CheckJump()
-        {
-            catAnimator.SetBool("isJumping", false);
-            mRenderer.flipX = (targetMove.x < 0.0f);
+						canJump = false;
+					}
+				}
+			MoveOn:
+				playTime += Time.deltaTime;
+				scoreText.text = "" + (int)score + "ft"; //string.Format("{0:n2}", score) + "ft";
+			}
+		}
 
-            if (targetMove.x < 0.0f)
-            {
-                mRenderer.flipX = true;
-            }
-            if (targetMove.x >= 0.0f)
-            {
-                mRenderer.flipX = false;
-            }
+		//This function resets canJump and sprites.
+		private void CheckJump()
+		{
+			catAnimator.SetBool("isJumping", false);
+			mRenderer.flipX = (targetMove.x < 0.0f);
 
-            canJump = true;
-        }
+			if (targetMove.x < 0.0f)
+			{
+				mRenderer.flipX = true;
+			}
+			if (targetMove.x >= 0.0f)
+			{
+				mRenderer.flipX = false;
+			}
 
-        private void OnTriggerEnter2D(Collider2D collision)
-        {
-            if (collision.gameObject == targetPlat)
-            {
-                catAnimator.SetBool("isJumping", false);
-                mRenderer.flipX = (targetMove.x < 0.0f);
+			canJump = true;
+		}
 
-                if (targetMove.x < 0.0f)
-                {
-                    mRenderer.flipX = true;
-                }
-                if (targetMove.x >= 0.0f)
-                {
-                    mRenderer.flipX = false;
-                }
+		private void OnTriggerEnter2D(Collider2D collision)
+		{
+			if (collision.gameObject == targetPlat)
+			{
+				catAnimator.SetBool("isJumping", false);
+				mRenderer.flipX = (targetMove.x < 0.0f);
 
-                canJump = true;
-            }
+				if (targetMove.x < 0.0f)
+				{
+					mRenderer.flipX = true;
+				}
+				if (targetMove.x >= 0.0f)
+				{
+					mRenderer.flipX = false;
+				}
 
-        }
+				canJump = true;
+			}
 
-        public GameObject GetTarget()
-        {
-            return targetPlat;
-        }
+		}
 
-        public float GetScore()
-        {
-            return score;
-        }
+		public GameObject GetTarget()
+		{
+			return targetPlat;
+		}
 
-        public void AddToScore(float value)
-        {
-            score += value;
-        }
+		public float GetScore()
+		{
+			return score;
+		}
 
-        private string TrimFloat(float value, int decimalPlaces)
-        {
-            string result = value.ToString();
-            int dot = result.IndexOf('.');
-            if ( dot == -1 || dot + decimalPlaces + 1 >= result.Length)
-                return result;
+		public void AddToScore(float value)
+		{
+			score += value;
+		}
 
-            return result.Remove(dot + decimalPlaces + 1);//5.555
-        }
+		private string TrimFloat(float value, int decimalPlaces)
+		{
+			string result = value.ToString();
+			int dot = result.IndexOf('.');
+			if ( dot == -1 || dot + decimalPlaces + 1 >= result.Length)
+				return result;
 
-        IEnumerator DeathAudio(float delay)
-        {
-            //meowAudio.Play();
-            yield return new WaitForSeconds(delay);
-            meowAudio.Play();
-        }
+			return result.Remove(dot + decimalPlaces + 1);//5.555
+		}
 
-        public void AddDeathListener(PlayerDeath func)
-        {
-            onPlayerDeath += func;
-        }
-    }
+		IEnumerator DeathAudio(float delay)
+		{
+			//meowAudio.Play();
+			yield return new WaitForSeconds(delay);
+			meowAudio.Play();
+		}
+
+		public void AddDeathListener(PlayerDeath func)
+		{
+			onPlayerDeath += func;
+		}
+	}
 }

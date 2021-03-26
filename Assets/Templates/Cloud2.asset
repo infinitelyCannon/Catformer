@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a0aee7b5f27eef49bb6b23f7fe05297, type: 3}
+  m_Name: Cloud2
+  m_EditorClassIdentifier: 
+  Rotation: {x: 0, y: 0, z: 0}
+  Scale: {x: 0.7, y: 0.7, z: 1}
+  speed: 7
+  isGood: 1
+  timeLeft: 3
+  shouldFade: 1
+  sprite: {fileID: 21300000, guid: 4957b8c37e66be74e86b213fee977c6b, type: 3}
+  Size: {x: 6.4, y: 3.9}
+  ParticlePrefab: {fileID: 3067978318858798979, guid: e0692d838c4866046aeae36dd972602b,
+    type: 3}

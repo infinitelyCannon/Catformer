@@ -1,133 +1,202 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using System.Reflection;
+using System;
 using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    public float speed;
-    public bool isGood;
-    public float timeLeft = 3;
-    public bool shouldFade;
-    float InitialTimeLeft;
-    public bool playerPresent;
+	public float speed;
+	public bool isGood;
+	public float timeLeft = 3;
+	public bool shouldFade;
+	
+	private float InitialTimeLeft;
+	private bool playerPresent;
 
-    [Header("Leaf Variables Only")]
-    public Vector3 leafBoundary;
-    public Color boundaryColor = Color.yellow;
+	SpriteRenderer platformRenderer;
+	private float alpha = 1.0f;
+	ParticleSystem particles;
+	Animator animator;
 
-    SpriteRenderer platformRenderer;
-    private float alpha = 1.0f;
-    ParticleSystem particles;
-    Animator animator;
+	private Camera mCamera;
+	float camHeight;
+	private Vector3 bottomEdge;
+	private bool isLeaf;
+	private PlatformGenerator Parent;
 
-    private Camera mCamera;
-    float camHeight;
-    private Vector3 bottomEdge;
-    private bool isLeaf;
+	// Start is called before the first frame update
+	void Awake()
+	{
+		particles = this.gameObject.GetComponentInChildren<ParticleSystem>();
+		animator = gameObject.GetComponent<Animator>();
+		playerPresent = false;
+		platformRenderer = gameObject.GetComponent<SpriteRenderer>();
+		InitialTimeLeft = timeLeft;
+		mCamera = Camera.main;
+		camHeight = Mathf.Abs(Vector3.Distance(
+			mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10)),
+			mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10))
+		));
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        particles = this.gameObject.GetComponentInChildren<ParticleSystem>();
-        animator = gameObject.GetComponent<Animator>();
-        playerPresent = false;
-        platformRenderer = gameObject.GetComponent<SpriteRenderer>();
-        InitialTimeLeft = timeLeft;
-        mCamera = Camera.main;
-        camHeight = Mathf.Abs(Vector3.Distance(
-            mCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 10)),
-            mCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 10))
-        ));
+		Catformer.PlayerScript player = GameObject.FindGameObjectWithTag("Player").GetComponent<Catformer.PlayerScript>();
+		if(player.GetScore() >= 160f)
+		{
+			timeLeft = 2f;
+			InitialTimeLeft = 2f;
+		}
+		else if(player.GetScore() >= 300f)
+		{
+			timeLeft = 1f;
+			InitialTimeLeft = 1f;
+		}
 
-        Catformer.PlayerScript player = GameObject.FindGameObjectWithTag("Player").GetComponent<Catformer.PlayerScript>();
-        if(player.GetScore() >= 160f)
-        {
-            timeLeft = 2f;
-            InitialTimeLeft = 2f;
-        }
-        else if(player.GetScore() >= 300f)
-        {
-            timeLeft = 1f;
-            InitialTimeLeft = 1f;
-        }
+		isLeaf = platformRenderer.sprite.name.Contains("Leaf");
+	}
 
-        isLeaf = platformRenderer.sprite.name.Contains("Leaf");
-    }
-
-    // Update is called once per frame
+	// Update is called once per frame
    void Update()
-    {
-        if(isLeaf)
-            transform.position += new Vector3(0, -1, 0) * speed * Time.deltaTime;
+	{
+		if(isLeaf)
+			transform.position += new Vector3(0, -1, 0) * speed * Time.deltaTime;
 
-        if (playerPresent == true && shouldFade)
-        {
-            timeLeft -= Time.deltaTime;
-            alpha = ((timeLeft / InitialTimeLeft)) * (1f) / (InitialTimeLeft - timeLeft);
-            platformRenderer.color = new Color(1, 1, 1, alpha);
-            if (timeLeft <= 0)
-            {
-                Destroy(gameObject);
-            }
-        }
+		if (playerPresent == true && shouldFade)
+		{
+			timeLeft -= Time.deltaTime;
+			alpha = ((timeLeft / InitialTimeLeft)) * (1f) / (InitialTimeLeft - timeLeft);
+			platformRenderer.color = new Color(1, 1, 1, alpha);
+			if (timeLeft <= 0)
+			{
+				Recycle();
+			}
+		}
 
-        if ((mCamera.transform.position.y - transform.position.y) > 20f)
-        {
-            Destroy(gameObject);
-        }
-    }
+		if (OutOfFrame()/*(mCamera.transform.position.y - transform.position.y) > 20f*/)
+		{
+			Recycle();
+		}
+	}
 
-    // Play particles
-    private void OnMouseDown() 
-    {
-        if (Time.timeScale > 0)
-        {
-            bottomEdge = mCamera.ViewportToWorldPoint(new Vector3(0, 0, 10));
-            
-            if (particles != null && !particles.isPlaying)
-            {
-                //particles.Play();
-            }
+	private bool OutOfFrame()
+	{
+		Vector3 camBottom = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0, 10));
+		Bounds box = platformRenderer.bounds;
 
-            if (animator != null)
-                animator.SetTrigger("Zapp");
-        }
-    }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        
-    }
+		return box.max.y < camBottom.y;
+	}
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        GameObject playerRef = GameObject.FindGameObjectWithTag("Player");
-        if (isGood == true && collision.gameObject.CompareTag("Player") && playerRef.GetComponent<Catformer.PlayerScript>().GetTarget() == gameObject)
-        {
-            playerPresent = true;
-        }
-        particles.Play();
-    }
+	private void Recycle()
+	{
+		Parent = transform.parent.GetComponent<PlatformGenerator>();
+		particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+		transform.position = Parent.StartLocation;
+		gameObject.SetActive(false);
+	}
 
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        
-    }
-    IEnumerator FadeOut()
-    {
-        Debug.Log("Fading out: " + name);
+	public void Restart(PlatformData data, Vector3 location)
+	{
+		gameObject.SetActive(true);
+		BoxCollider2D collider = GetComponent<BoxCollider2D>();
 
-        while (platformRenderer.color.a > 0f)
-        {
-            if (Time.timeScale < 1f)
-                yield return new WaitForEndOfFrame();
-            alpha = ((timeLeft / InitialTimeLeft)) * (1f) / (InitialTimeLeft - timeLeft); 
-            platformRenderer.color = new Color(1, 1, 1, alpha);
-            yield return new WaitForEndOfFrame();
-        }
-    }
+		platformRenderer.sprite = data.sprite;
+		platformRenderer.color = Color.white;
+		playerPresent = false;
+		speed = data.speed;
+		isGood = data.isGood;
+		timeLeft = data.timeLeft;
+		InitialTimeLeft = timeLeft;
+		shouldFade = data.shouldFade;
+		collider.size = data.Size;
+		isLeaf = platformRenderer.sprite.name.Contains("Leaf");
+		transform.localRotation = Quaternion.Euler(data.Rotation);
+		transform.localScale = data.Scale;
+		transform.position = location;
 
+		PropertyInfo[] particleProps = particles.GetType().GetProperties();
+		ParticleSystem savedSystem = data.ParticlePrefab.GetComponent<ParticleSystem>();
 
+		foreach (var property in particleProps)
+		{
+			if(property.PropertyType.Name.Contains("Module") && !property.PropertyType.Name.Contains("SubEmitters"))
+			{
+				object module = property.GetValue(particles);
+				PropertyInfo[] properties = module.GetType().GetProperties();
+				object newModule = savedSystem.GetType().GetProperty(property.Name).GetValue(savedSystem);
 
+				foreach (var prop in properties)
+				{
+					if(prop.GetIndexParameters().Length == 0 && prop.CanWrite)
+					{
+						prop.SetValue(module, prop.GetValue(newModule));
+					}
+				}
+			}
+		}
+
+		ParticleSystemRenderer renderer = GetComponentInChildren<ParticleSystemRenderer>(),
+			savedRenderer = data.ParticlePrefab.GetComponent<ParticleSystemRenderer>();
+		particleProps = renderer.GetType().GetProperties();
+
+		foreach(var property in particleProps)
+		{
+			if(property.GetIndexParameters().Length == 0 && property.CanWrite && !property.Name.Contains("materials", true))
+			{
+				if (property.Name.Contains("material", true) && !property.Name.Equals("sharedMaterial"))
+					continue;
+				property.SetValue(renderer, property.GetValue(savedRenderer));
+			}
+		}
+
+		transform.GetChild(1).localPosition = data.ParticlePrefab.transform.localPosition;
+	}
+
+	// Play particles
+	private void OnMouseDown() 
+	{
+		if (Time.timeScale > 0)
+		{
+			bottomEdge = mCamera.ViewportToWorldPoint(new Vector3(0, 0, 10));
+			
+			if (particles != null && !particles.isPlaying)
+			{
+				//particles.Play();
+			}
+
+			if (animator != null)
+				animator.SetTrigger("Zapp");
+		}
+	}
+	private void OnCollisionEnter2D(Collision2D collision)
+	{
+		
+	}
+
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+		GameObject playerRef = GameObject.FindGameObjectWithTag("Player");
+		if (isGood == true && collision.gameObject.CompareTag("Player") && playerRef.GetComponent<Catformer.PlayerScript>().GetTarget() == gameObject)
+		{
+			playerPresent = true;
+			particles.Play();
+		}
+	}
+
+	private void OnTriggerStay2D(Collider2D collision)
+	{
+		
+	}
+	IEnumerator FadeOut()
+	{
+		Debug.Log("Fading out: " + name);
+
+		while (platformRenderer.color.a > 0f)
+		{
+			if (Time.timeScale < 1f)
+				yield return new WaitForEndOfFrame();
+			alpha = ((timeLeft / InitialTimeLeft)) * (1f) / (InitialTimeLeft - timeLeft); 
+			platformRenderer.color = new Color(1, 1, 1, alpha);
+			yield return new WaitForEndOfFrame();
+		}
+	}
 }
 
 

@@ -29,7 +29,9 @@ public class CameraController : MonoBehaviour
         playerRef = GameObject.FindGameObjectWithTag("Player").transform;
         lastPlayerPosition = playerRef.position.y;
         followTarget = GetComponent<Camera>().ViewportToWorldPoint(new Vector3(0.5f, followLine, Z_POS));
-        playerRef.GetComponent<Catformer.PlayerScript>().AddDeathListener(OnPlayerDeathTrigger);
+        Catformer.PlayerScript script = playerRef.GetComponent<Catformer.PlayerScript>();
+        if (script != null)
+            script.AddDeathListener(OnPlayerDeathTrigger);
     }
 
     private void Update()
