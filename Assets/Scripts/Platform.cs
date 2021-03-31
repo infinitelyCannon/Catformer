@@ -138,7 +138,7 @@ public class Platform : MonoBehaviour
 
 		foreach(var property in particleProps)
 		{
-			if(property.GetIndexParameters().Length == 0 && property.CanWrite && !property.Name.Contains("materials", true))
+			if(property.GetIndexParameters().Length == 0 && property.CanRead && property.CanWrite && !property.Name.Contains("materials", true))
 			{
 				if (property.Name.Contains("material", true) && !property.Name.Equals("sharedMaterial"))
 					continue;

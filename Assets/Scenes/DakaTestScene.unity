@@ -1053,9 +1053,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fa3142c3f6ae7db45896373cd3f2d432, type: 2}
   - {fileID: 11400000, guid: c53f9d60e13753745a3d86fe52960e7e, type: 2}
   - {fileID: 11400000, guid: a95ec92a5c7a83040b8a34f58ad46d94, type: 2}
-  cloudHeight: 215
-  sunsetCloudHeight: 285
-  spaceHeight: 315
+  cloudHeight: 188
+  sunsetCloudHeight: 277
+  spaceHeight: 300
   MaxPlatforms: 20
   StartLocation: {x: 0, y: 0, z: 0}
   SafetyZoneColor: {r: 0, g: 1, b: 1, a: 1}
@@ -1285,8 +1285,8 @@ MonoBehaviour:
   hazardWarningRight: {fileID: 628565903}
   selectHazard: 0
   timeLeft: 5
-  planeSpawnNow: 215
-  meteorSpawnNow: 315
+  planeSpawnNow: 188
+  meteorSpawnNow: 300
 --- !u!4 &1283644196 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 671280974662003870, guid: 0e8ffc358a7e7ad42bae3e1cdc169895,
@@ -1660,7 +1660,7 @@ GameObject:
   - component: {fileID: 2114952552}
   - component: {fileID: 2114952551}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Music
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
