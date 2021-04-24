@@ -111,17 +111,22 @@ public class Platform : MonoBehaviour
 		transform.localScale = data.Scale;
 		transform.position = location;
 
+		// The property info for the ParticleSystem class type and the saved instance
 		PropertyInfo[] particleProps = particles.GetType().GetProperties();
 		ParticleSystem savedSystem = data.ParticlePrefab.GetComponent<ParticleSystem>();
 
+		// For each property in this class,
 		foreach (var property in particleProps)
 		{
+			// Grab each particle module (except subemitters which aren't used)
 			if(property.PropertyType.Name.Contains("Module") && !property.PropertyType.Name.Contains("SubEmitters"))
 			{
+				// Grab the correspoinding module object on this GameObject, grab its properties,
 				object module = property.GetValue(particles);
 				PropertyInfo[] properties = module.GetType().GetProperties();
 				object newModule = savedSystem.GetType().GetProperty(property.Name).GetValue(savedSystem);
 
+				// Then loop through these properties and set them to the value from the prefab object.
 				foreach (var prop in properties)
 				{
 					if(prop.GetIndexParameters().Length == 0 && prop.CanWrite)
@@ -132,6 +137,7 @@ public class Platform : MonoBehaviour
 			}
 		}
 
+		// Repeat the process for the ParticleSystemRenderer.
 		ParticleSystemRenderer renderer = GetComponentInChildren<ParticleSystemRenderer>(),
 			savedRenderer = data.ParticlePrefab.GetComponent<ParticleSystemRenderer>();
 		particleProps = renderer.GetType().GetProperties();
